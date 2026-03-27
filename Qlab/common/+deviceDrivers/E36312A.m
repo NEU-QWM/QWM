@@ -1,25 +1,36 @@
-classdef E36312A < handle
-    % Copyright 2026 Northeastern University
+classdef E36312A < deviceDrivers.lib.GPIBorEthernet
+    % E36312A Driver for Keysight Triple Output Power Supply
     %
-    % Instrument driver for the Keysight E36312A Triple Output Power Supply
-
+    % Author: Adapted for MATLAB deviceDrivers style
+    %
     properties
-        visaObj
-        timeout = 5000;   % ms
+        Voltage       % Set/get voltage of selected channel (V)
+        Current       % Set/get current of selected channel (A)
+        VoltageLimit  % Voltage compliance/protection
+        CurrentLimit  % Current compliance/protection
+        output        % Output state (0=off, 1=on)
+        channel       % Selected channel (1,2,3)
+        mode          % Mode: 'voltage' or 'current'
     end
-
+    
+    properties (Access = private)
+        visaObj
+        timeout = 5000; % ms
+    end
+    
     methods
         %% Constructor
         function obj = E36312A(resourceString)
             obj.visaObj = visadev(resourceString);
             obj.visaObj.Timeout = obj.timeout;
 
-            obj.write("*IDN?");
-            idn = obj.read();
-            fprintf("Connected to: %s\n", idn);
+            idn = obj.query('*IDN?');
+            fprintf('Connected to: %s\n', idn);
         end
-
-        %% Low-level VISA helpers
+        
+        %% ========================
+        %% Low-level helpers
+        %% ========================
         function write(obj, cmd)
             writeline(obj.visaObj, cmd);
         end
@@ -28,120 +39,142 @@ classdef E36312A < handle
             out = readline(obj.visaObj);
         end
 
-        %% Reset
-        function reset(obj)
-            obj.write("*RST");
-            obj.write("*CLS");
+        function out = query(obj, cmd)
+            obj.write(cmd);
+            out = obj.read();
         end
-
-        %% Select channel (1, 2, or 3)
+        
+        %% ========================
+        %% Channel control
+        %% ========================
         function selectChannel(obj, ch)
-            validateattributes(ch, {'numeric'}, {'scalar','>=',1,'<=',3});
-            obj.write(sprintf("INST:NSEL %d", ch));
+            assert(ismember(ch,1:3),'Channel must be 1,2, or 3');
+            obj.channel = ch;
+            obj.write(sprintf('INST:NSEL %d', ch));
         end
-
+        
         %% ========================
-        %% CURRENT CONTROL
+        %% Voltage / Current getters
         %% ========================
-
-        function setCurrent(obj, ch, current_A)
-            obj.selectChannel(ch);
-            obj.write(sprintf("CURR %.6f", current_A));
+        function val = get.Voltage(obj)
+            obj.selectChannel(obj.channel);
+            val = str2double(obj.query('MEAS:VOLT?'));
         end
-
-        function setCurrent_mA(obj, ch, current_mA)
-            obj.setCurrent(ch, current_mA / 1000);
+        
+        function val = get.Current(obj)
+            obj.selectChannel(obj.channel);
+            val = str2double(obj.query('MEAS:CURR?'));
         end
-
-        function i = measureCurrent(obj, ch)
-            obj.selectChannel(ch);
-            obj.write("MEAS:CURR?");
-            i = str2double(obj.read());
+        
+        function val = get.output(obj)
+            obj.selectChannel(obj.channel);
+            val = str2double(obj.query('OUTP?'));
         end
-
-        function i_mA = measureCurrent_mA(obj, ch)
-            i_mA = obj.measureCurrent(ch) * 1000;
-        end
-
+        
         %% ========================
-        %% VOLTAGE CONTROL
+        %% Voltage / Current setters
         %% ========================
-
-        function setVoltage(obj, ch, voltage_V)
-            obj.selectChannel(ch);
-            obj.write(sprintf("VOLT %.6f", voltage_V));
+        function obj = set.Voltage(obj, val)
+            obj.selectChannel(obj.channel);
+            obj.write(sprintf('VOLT %.6f', val));
         end
-
-        function setVoltage_mV(obj, ch, voltage_mV)
-            obj.setVoltage(ch, voltage_mV / 1000);
+        
+        function obj = set.Current(obj, val)
+            obj.selectChannel(obj.channel);
+            obj.write(sprintf('CURR %.6f', val));
         end
-
-        function v = measureVoltage(obj, ch)
-            obj.selectChannel(ch);
-            obj.write("MEAS:VOLT?");
-            v = str2double(obj.read());
+        
+        function obj = set.VoltageLimit(obj, val)
+            obj.selectChannel(obj.channel);
+            obj.write(sprintf('VOLT:PROT %.6f', val));
         end
-
-        function v_mV = measureVoltage_mV(obj, ch)
-            v_mV = obj.measureVoltage(ch) * 1000;
+        
+        function obj = set.CurrentLimit(obj, val)
+            obj.selectChannel(obj.channel);
+            obj.write(sprintf('CURR:PROT %.6f', val));
         end
-
-        %% Voltage ramp (safe sweeping)
-        function rampVoltage(obj, ch, target_V, step_V, pause_s)
-            obj.selectChannel(ch);
-
-            current_V = obj.measureVoltage(ch);
-
+        
+        function obj = set.output(obj, val)
+            obj.selectChannel(obj.channel);
+            if isnumeric(val) || islogical(val)
+                val = num2str(val);
+            end
+            assert(ismember(val,{'0','1','ON','OFF'}),'Invalid output value');
+            obj.write(sprintf('OUTP %s', val));
+        end
+        
+        %% ========================
+        %% Mode control
+        %% ========================
+        function VoltageMode(obj)
+            obj.selectChannel(obj.channel);
+            obj.mode = 'voltage';
+            obj.write('SOUR:FUNC VOLT');
+        end
+        
+        function CurrentMode(obj)
+            obj.selectChannel(obj.channel);
+            obj.mode = 'current';
+            obj.write('SOUR:FUNC CURR');
+        end
+        
+        %% ========================
+        %% Voltage ramp / safe sweep
+        %% ========================
+        function rampVoltage(obj, target_V, step_V, pause_s)
+            obj.selectChannel(obj.channel);
+            current_V = obj.Voltage;
+            
             if target_V > current_V
                 sweep = current_V:step_V:target_V;
             else
                 sweep = current_V:-step_V:target_V;
             end
-
+            
             for v = sweep
-                obj.write(sprintf("VOLT %.6f", v));
+                obj.Voltage = v;
                 pause(pause_s);
             end
-
-            % Ensure exact final value
-            obj.write(sprintf("VOLT %.6f", target_V));
+            
+            obj.Voltage = target_V;
         end
-
+        
         %% ========================
-        %% OUTPUT CONTROL
+        %% Output control helpers
         %% ========================
-
-        function outputOn(obj, ch)
-            obj.selectChannel(ch);
-            obj.write("OUTP ON");
+        function outputOn(obj)
+            obj.output = 1;
         end
-
-        function outputOff(obj, ch)
-            obj.selectChannel(ch);
-            obj.write("OUTP OFF");
+        
+        function outputOff(obj)
+            obj.output = 0;
         end
-
+        
         function allOff(obj)
             for ch = 1:3
                 obj.selectChannel(ch);
-                obj.write("OUTP OFF");
+                obj.outputOff();
             end
         end
-
+        
         %% ========================
-        %% SAFE CHANNEL SETUP
+        %% Safe channel setup
         %% ========================
-
         function setChannel(obj, ch, voltage_V, current_A)
-            obj.setCurrent(ch, current_A);   % limit first
-            obj.setVoltage(ch, voltage_V);
-            obj.outputOn(ch);
+            obj.selectChannel(ch);
+            obj.Current = current_A;   % limit first
+            obj.Voltage = voltage_V;
+            obj.outputOn();
         end
-
+        
         %% ========================
-        %% Destructor
+        %% Reset / cleanup
         %% ========================
-
+        function reset(obj)
+            obj.write('*RST');
+            obj.write('*CLS');
+        end
+        
         function delete(obj)
             try
                 clear obj.visaObj
