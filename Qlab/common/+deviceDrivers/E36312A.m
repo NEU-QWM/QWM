@@ -15,15 +15,13 @@ classdef E36312A < deviceDrivers.lib.GPIBorEthernet
     
     properties (Access = private)
         visaObj
-        timeout = 5000; % ms
     end
     
     methods
         %% Constructor
         function obj = E36312A(resourceString)
             obj.visaObj = visadev(resourceString);
-            obj.visaObj.Timeout = obj.timeout;
-
+            
             idn = obj.query('*IDN?');
             fprintf('Connected to: %s\n', idn);
         end

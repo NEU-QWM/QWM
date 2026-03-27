@@ -29,6 +29,7 @@ classdef RS_ZNB3020 < deviceDrivers.lib.GPIBorEthernet
         err;
         trigger_source;     % Values: ['external', 'immediate', 'manual']
         frequency;          % Frequency, for use in CW mode
+        visa_timeout = 120; % Increased timeout for low bw measurement
     end
 
     methods (Access = public)
