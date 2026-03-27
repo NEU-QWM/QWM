@@ -9,10 +9,12 @@
 
 function [data] = VNA_vs_TestPower_2VNA(PowerList, AveragingNumberList, InitialWaitTime)
 pause on;
-VNA = deviceDrivers.AgilentE8363C();
-%VNA.connect('16');
-VNA.connect('128.33.89.251');   % Old
-%VNA.connect('128.33.89.252');   % New
+% VNA = deviceDrivers.AgilentE8363C();
+% VNA.connect('16');
+% VNA.connect('128.33.89.251');   % Old
+% VNA.connect('128.33.89.252');   % Old
+VNA = deviceDrivers.RS_ZNB3020();
+VNA.connect('172.31.255.89');   % New
 
 %%%%%%%%%%%%%%%%%%%%%     RUN THE EXPERIMENT      %%%%%%%%%%%%%%%%%%%%%%%%%
 VNA.power = PowerList(1); % Power in dBm

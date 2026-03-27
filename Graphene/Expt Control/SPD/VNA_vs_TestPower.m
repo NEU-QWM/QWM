@@ -9,10 +9,12 @@
 
 function [data] = VNA_vs_TestPower(PowerList, AveragingNumberList, InitialWaitTime)
 pause on;
-VNA = deviceDrivers.AgilentE8363C();
-%VNA.connect('16');
-%VNA.connect('128.33.89.251');   % Old
-VNA.connect('128.33.89.252');   % New
+% VNA = deviceDrivers.AgilentE8363C();
+% VNA.connect('16');
+% VNA.connect('128.33.89.251');   % Old
+% VNA.connect('128.33.89.252');   % Old
+VNA = deviceDrivers.RS_ZNB3020();
+VNA.connect('172.31.255.89');   % New
 
 %%%%%%%%%%%%%%%%%%%%%     RUN THE EXPERIMENT      %%%%%%%%%%%%%%%%%%%%%%%%%
 VNA.power = PowerList(1); % Power in dBm
@@ -20,7 +22,8 @@ VNA.disconnect();
 total_num = length(PowerList);
 pause(InitialWaitTime);
 for k=1:length(PowerList)
-    VNA.connect('128.33.89.252');   % New
+    % VNA.connect('128.33.89.252');   % Old
+    VNA.connect('172.31.255.89');
     sprintf('The %d/%d scanning with VNA test power %e', k, total_num, PowerList(k))
     VNA.power = PowerList(k);
     VNA.average_counts = AveragingNumberList(k);
@@ -32,7 +35,8 @@ data.Freq = spec.Freq;
 
 %%%%%%%%%%%%%%%%%%%%    BACK TO DEFAULT, CLEAN UP     %%%%%%%%%%%%%%%%%%%%%%%%%
 %pause off;
-VNA.connect('128.33.89.252');   % New
+% VNA.connect('128.33.89.252');   % Old
+VNA.connect('172.31.255.89');
 VNA.power = min(PowerList);
 %VNA.average_counts = max(AveragingNumberList);
 VNA.disconnect();

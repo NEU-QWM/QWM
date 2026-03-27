@@ -9,13 +9,12 @@
 %%%%%%%%%%%%     CLEAR  and INITIALIZE PATH     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function spec = GetVNASpec_VNA()
-
 %VNA = deviceDrivers.AgilentE8363C();
 %VNA.connect('128.33.89.251')   %old VNA
 
 VNA = deviceDrivers.RS_ZNB3020();
-
 VNA.connect('172.31.255.89');   % New
+
 if VNA.averaging == '1'
     VNA.reaverage();
 end
