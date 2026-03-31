@@ -9,8 +9,10 @@
 %%%%%%%%%%%%     CLEAR  and INITIALIZE PATH     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function psd = GetPSD_SpecAnalyzer()
-SpecAnalyzer = deviceDrivers.AgilentN9020A();
-SpecAnalyzer.connect('128.33.89.217');
+% SpecAnalyzer = deviceDrivers.AgilentN9020A();
+% SpecAnalyzer.connect('128.33.89.217');
+SpecAnalyzer = deviceDrivers.RS_FPL();
+SpecAnalyzer.connect('172.31.255.88');
 [freq, spec] = SpecAnalyzer.SAGetTrace();
 SpecAnalyzer.disconnect();
 clear SpecAnalyzer
