@@ -38,7 +38,7 @@ data.Freq = result.Freq;
 %%%%%%%%%%%%%%%%%%%%    BACK TO DEFAULT, CLEAN UP     %%%%%%%%%%%%%%%%%%%%%%%%%
 % Yoko.value = 0;
 % Yoko.disconnect();
-Keithley.value = 0;
+Keithley.value = 0.0e-3;
 Keithley.disconnect();
 pause off; clear result Keithley;
 end
