@@ -4,7 +4,7 @@ classdef GPIBorEthernet < hgsetget
         interface
         buffer_size = 1048576;   % 1 MB buffer
         DEFAULT_PORT = 5025;     % TCP/IP port
-        timeout = 360;            % default timeout in seconds (adjust as needed)
+        timeout = 600;            % default timeout in seconds (adjust as needed)
     end
     
     properties (SetAccess=private)
