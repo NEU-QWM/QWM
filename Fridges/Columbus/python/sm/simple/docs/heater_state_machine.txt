@@ -1,0 +1,32 @@
+#
+# Simples possible state-machine to control heater in oscillatory manner
+#
+
+params:
+    HEATER_POWER_ON_TEMP 25         # C, if temperature below start heating
+    HEATER_POWER_OFF_TEMP 30       # C, if temperature above stop heating
+
+INITIAL_SETTINGS:
+    heaters_off([1, 2, 3, 4])
+
+# Wait for user to start action
+IDLE:
+    while 1:
+        if first(operation_queue) = CONTROL_HEATER:
+            operation_queue.pop()  # remove operation
+            goto_state(HEATER_ON)
+
+HEATER_ON:
+    heater_on([1])
+    heater_power([1]) = 1  # W, could be skipped f
+    while 1:
+        if T5 > HEATER_POWER_OFF_TEMP:
+            goto_state(HEATER_OFF)
+            sleep(5)
+
+HEATER_OFF:
+    heater_off([1])
+    while 1:
+        if T5 < HEATER_POWER_ON_TEMP:
+            goto_state(HEATER_ON)
+            sleep(5)

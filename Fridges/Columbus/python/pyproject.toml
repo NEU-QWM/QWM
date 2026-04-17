@@ -1,0 +1,11 @@
+# pyproject.toml
+[tool.ruff]
+line-length=120
+indent-width=4
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+pythonpath = [ "." ]
+testpaths = [
+    "tests",
+]
