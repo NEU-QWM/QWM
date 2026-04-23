@@ -24,5 +24,5 @@ VNA.disconnect();
 clear VNA;
 
 figure(123); clf; plot(spec.Freq*1e-9, 20*log10(abs(spec.S))); grid on;
-xlabel('Frequency (GHz)'); ylabel('S_{11} (dB)');
-%xlabel('Frequency (GHz)'); ylabel('S_{21} (dB)');
+% xlabel('Frequency (GHz)'); ylabel('S_{11} (dB)');
+xlabel('Frequency (GHz)'); ylabel('S_{21} (dB)');
