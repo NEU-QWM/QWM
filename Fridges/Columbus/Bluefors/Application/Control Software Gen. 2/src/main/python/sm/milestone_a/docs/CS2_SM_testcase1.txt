@@ -1,0 +1,91 @@
+#
+# Test case for CS2 test-hardware
+#
+# Idea is to have simple state-machine that has most of the functionality needed in real program
+#
+# System starts from idle state. After user sends operation START_PUMPING system enters into pump
+# sequence where system is first pumped rough (S1) and then pumped with turbo (T1)
+#
+# START_PUMPING operation is done once PUMP_TURBO state is done successfully
+#
+
+params:
+    ROUGH_PUMPING_MAX_TIME  200         # max time to pump to reach low-enough pressure for turbo
+    BOOSTER_PUMPING_MAX_TIME  500       # max time to pump to reach low-enough pressure for turbo
+    BOOSTER_START_PRESSURE_LIMIT 5      # mBar
+    BOOSTER_BASE_PRESSURE_LIMIT  0.001  # pressure upper limit where booster pumped low enough vacuum
+    ZERO_CIRCULATION_FLOW_LIMIT 10      # limit for circulation when there is no circulation
+
+
+INITIAL_SETTINGS:
+    valves_off([v2, v3])
+    valves_on([])
+    pump_off(circulation_rough_pump)
+    pump_off(circulation_booster_pump)
+
+CHECK_INIT_SETTINGS:
+    If circulation_flow > ZERO_CIRCULATION_FLOW_LIMIT:
+        error = FLOW_CIRCULATION_ERROR
+        error_message = "Flow circulation value too high"
+        goto_state(MANUAL)
+
+
+# Wait for user to start action
+IDLE:
+    while 1:
+        if first(operation_queue) = PUMP_SYSTEM:
+            operation_queue.pop()  # remove operation
+            goto_state(PUMP_ROUGH)
+
+PUMP_ROUGH:
+    valves_off([v2])
+    valves_on([v3])
+    wait(10)
+    pump_on(circulation_rough_pump)
+	reset_timer(timer1)
+	while timer1 < ROUGH_PUMPING_MAX_TIME:
+	    wait(5)
+	    if P2 < BOOSTER_START_PRESSURE_LIMIT:
+	        goto_state(PUMP_TURBO)
+    # too much time elapsed for pumping
+    error = ROUGH_PUMP_ERROR
+    error_message="P2 not low enough after rough-pumping"
+    publish(error_alert)
+    goto_state(MANUAL)
+
+
+PUMP_TURBO:
+    pump_on(circulation_booster_pump)
+	reset_timer(timer1)
+	while timer1 < BOOSTER_PUMPING_MAX_TIME:
+	    wait(5)
+	    if P2 < BOOSTER_BASE_PRESSURE_LIMIT:
+	        goto_state(PUMP_TURBO)
+    # too much time elapsed for pumping
+    error = TURBO_PUMP_ERROR
+    error_message = "P2 not low enough after turbo-pumping"
+    publish(error_alert)
+    goto_state(MANUAL)
+
+IDLE_LOW_PRESSURE:
+    while 1:
+        if first(operation_queue) == STOP_SYSTEM:
+            operation_queue.pop()  # remove operation
+            goto_state(STOP_PUMPS)
+
+STOP_PUMPS:
+    pump_off(circulation_rough_pump)
+    pump_off(circulation_booster_pump)
+    wait(20)
+    goto_state(IDLE)
+
+MANUAL:
+    while(1):
+        pass
+        # stay forever
+
+
+
+
+
+

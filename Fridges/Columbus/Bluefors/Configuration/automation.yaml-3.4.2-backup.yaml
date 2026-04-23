@@ -1,0 +1,191 @@
+version: 3.4.2
+errorRecoveryDisabled: false
+startupRecoveryDisabled: true
+automations:
+- name: dilution-systems
+  default: true
+  settings:
+  - id: persistenceMaxTimeout
+    value: 60
+    type: float
+    name: Persistence Max Timeout
+  - id: dilutionRefrigeratorEvacuatedPressure
+    value: 0.01
+    type: float
+    name: Dilution Refrigerator Evacuated Pressure
+  - id: roughPumpingMaxTime
+    value: 10800
+    type: float
+    name: Rough Pumping Max Time
+  - id: turboPumpingMaxTime
+    value: 10800
+    type: float
+    name: Turbo Pumping Max Time
+  - id: pumpRoughFinalPressure
+    value: 0.001
+    type: float
+    name: Pump Rough Final Pressure
+  - id: pumpDRUnitTime
+    value: 3600
+    type: float
+    name: Pump DR Unit Time
+  - id: vacuumPressureErrorTolerance
+    value: 1.05
+    type: float
+    name: Vacuum Pressure Error Tolerance
+  - id: pumpTurboFinalPressure
+    value: 5.0E-5
+    type: float
+    name: Pump Turbo Final Pressure
+  - id: turboPumpMaxSpeedStartup
+    value: 50
+    type: float
+    name: Turbo Pump Max Speed Startup
+  - id: serviceBoosterPumpAvailable
+    value: true
+    type: bool
+    name: Service Booster Pump Available
+  - id: pulseTubeCoolingMaxTime
+    value: 259200
+    type: float
+    name: Pulse Tube Cooling Max Time
+  - id: pulseTubeCoolingFinalTemperature
+    value: 15
+    type: float
+    name: Pulse Tube Cooling Final Temperature
+  - id: pulseTubeCoolingTargetPressure
+    value: 3.0E-7
+    type: float
+    name: Pulse Tube Cooling Target Pressure
+  - id: pulseTubeCoolingFinalizationMaxTime
+    value: 86400
+    type: float
+    name: Pulse Tube Cooling Finalization Max Time
+  - id: ppcCycleDuration
+    value: 5400
+    type: float
+    name: Ppc Cycle Duration
+  - id: ppcPumpingTime
+    value: 15
+    type: float
+    name: Ppc Pumping Time
+  - id: ppcInletTime
+    value: 8
+    type: float
+    name: Ppc Inlet Time
+  - id: ppcPressureLimit
+    value: 0.05
+    type: float
+    name: Ppc Pressure Limit
+  - id: initialTankPressure
+    value: 0.74
+    type: float
+    name: Initial Tank Pressure
+  - id: vacuumPressureLimit
+    value: 5.0E-8
+    type: float
+    name: Vacuum Pressure Limit
+  - id: condensingTriggerHeatswitches
+    value: 0.08
+    type: float
+    name: Condensing Trigger Heatswitches
+  - id: systemBlockedTimer
+    value: 10800
+    type: float
+    name: System Blocked Timer
+  - id: condensingPressureDropMaxTime
+    value: 7200
+    type: float
+    name: Condensing Pressure Drop Max Time
+  - id: condensingPressureDifferenceMaxTime
+    value: 7200
+    type: float
+    name: Condensing Pressure Difference Max Time
+  - id: stillHeatingPower
+    value: 0.008
+    type: float
+    name: Still Heating Power
+  - id: bypassLN2Trap
+    value: false
+    type: bool
+    name: Bypass LN2 Trap
+  - id: serviceEmptyPressure
+    value: 0.01
+    type: float
+    name: Service Empty Pressure
+  - id: coolingStoppingTime
+    value: 900
+    type: float
+    name: Cooling Stopping Time
+  - id: mixtureCollectingPressureLimit
+    value: 0.05
+    type: float
+    name: Mixture Collecting Pressure Limit
+  - id: collectExtraMixtureTimeLimit
+    value: 1800
+    type: float
+    name: Collect Extra Mixture Time Limit
+  - id: softVacuumWithN2
+    value: false
+    type: bool
+    name: Soft Vacuum With N2
+  - id: softVacuumCycles
+    value: 2
+    type: int
+    name: Soft Vacuum Cycles
+  - id: p2PressureLimitMixtureInTank
+    value: 5.0E-5
+    type: float
+    name: P2 Pressure Limit Mixture In Tank
+  - id: p4PressureLimitMixtureInTank
+    value: 0.45
+    type: float
+    name: P4 Pressure Limit Mixture In Tank
+  - id: collectMixtureTimeLimit
+    value: 36000
+    type: float
+    name: Collect Mixture Time Limit
+  - id: tankPressureStabilizationTime
+    value: 1800
+    type: float
+    name: Tank Pressure Stabilization Time
+  - id: pressureStabilizationSqLimit
+    value: 5.0E-6
+    type: float
+    name: Pressure Stabilization Sq Limit
+  - id: tankPressureStabilizationMaxTime
+    value: 36000
+    type: float
+    name: Tank Pressure Stabilization Max Time
+  - id: 4KHeaterTemperatureLimit
+    value: 300
+    type: float
+    name: 4 K Heater Temperature Limit
+  - id: stillHeaterTemperatureLimit
+    value: 290
+    type: float
+    name: Still Heater Temperature Limit
+  - id: warmupMaxTime
+    value: 129600
+    type: float
+    name: warmup Max Time
+  - id: systemWarmTemperature
+    value: 290
+    type: float
+    name: System Warm Temperature
+  - id: VentWithN2
+    value: false
+    type: bool
+    name: Vent With N2
+  - id: systemVentedPressure
+    value: 0.98
+    type: float
+    name: System Vented Pressure
+  - id: numberOf4KHeaters
+    value: 1
+    type: int
+    name: Number of warm up heaters installed to the system
+  - id: bypassLN2Trap
+    value: false
+    type: bool
+    name: Bypass LN2 Trap

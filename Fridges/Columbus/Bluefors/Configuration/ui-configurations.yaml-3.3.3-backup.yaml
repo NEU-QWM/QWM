@@ -1,0 +1,2080 @@
+version: 3.3.3
+application-settings:
+  values:
+    unitPrefixes: "y,z,a,f,p,n,µ,m,k,M,G,T,P,E,Z,Y,"
+    digits: 4
+    useLocale: false
+    numericThresholds:
+      global:
+        lowerThan: 1.0E-14
+        higherThan: -1.0E-14
+        to: 0
+diagrams-conditional-elements:
+  system-diagram:
+    fse--group:
+      hide: true
+    double-cond-lines:
+      hide: true
+    r1--lines:
+      hide: true
+    b1c--group:
+      hide: true
+    air--group:
+      hide: true
+    turbo-1:
+      position:
+        "y": 10
+    turbo-2:
+      position:
+        "y": 15
+    turbo-3:
+      hide: true
+    r1--to--b1c--curve:
+      hide: true
+    b1c--and--r1-lines--circle:
+      hide: true
+    b1c--or--r1-lines--line:
+      hide: true
+    b1c--no-r1--line:
+      hide: true
+    r1--curve--left:
+      hide: true
+    Pump-Expandable-expand:
+      hide: true
+    turbo-expand:
+      position:
+        x: -6
+  system-b1:
+    b1c--or--r1-lines:
+      hide: true
+    fse--group:
+      hide: true
+    turbo-3:
+      hide: true
+    V204no:
+      hide: true
+    V205no:
+      hide: true
+    b1c--or--r1-lines--line:
+      hide: true
+  system-r1:
+    r1--full:
+      hide: true
+    r1a-bypass--group:
+      hide: true
+    r1b-bypass--group:
+      hide: true
+system-diagram:
+  name: GHS-400
+  backgroundImageUrl: /static/Background-GHS-250-400-1000.svg
+  devices:
+  - placeholderString: P1
+    name: P1
+    offset:
+      x: 30
+      "y": -6
+    stateImageUrlTemplate: "/static/Pressure-large-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P1_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P1_ERROR_VALUE
+  - placeholderString: P1-Switch
+    name: P1
+    errorValue: P1_ERROR_VALUE
+    offset:
+      x: 15
+      "y": 0
+    stateImageUrlTemplate: "/static/SwitchComponent-state{{ state }}.svg"
+    stateValue:
+      mapping: P1_ENABLED
+    clickable:
+      deviceId: P1
+      command: activateColdCathode
+      value: true
+  - placeholderString: P2
+    name: P2
+    offset:
+      x: 0
+      "y": -8
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P2_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P2_ERROR_VALUE
+  - placeholderString: P3
+    name: P3
+    offset:
+      x: 0
+      "y": -6
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P3_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P3_ERROR_VALUE
+  - placeholderString: P4
+    name: P4
+    offset:
+      x: -10
+      "y": -6
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P4_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P4_ERROR_VALUE
+  - placeholderString: P5
+    name: P5
+    offset:
+      x: 10
+      "y": -6
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P5_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P5_ERROR_VALUE
+  - placeholderString: P6
+    name: P6
+    offset:
+      x: 6
+      "y": -7
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P6_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P6_ERROR_VALUE
+  - placeholderString: P7
+    name: P7
+    offset:
+      x: -16
+      "y": 0
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P7_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P7_ERROR_VALUE
+  - placeholderString: Turbo
+    name: B1
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Turbo-state{{ state }}.svg"
+    errorValue: TURBO_PUMP_ERROR_VALUE
+    stateValue:
+      mapping: TURBO_PUMP_ENABLED
+  - placeholderString: Turbo-expand
+    name: B1
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: /static/Zoom-stateDefault.svg
+    clickable:
+      expand: system-b1
+  - placeholderString: B2
+    name: B2
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/PumpUD-state{{ state }}.svg"
+    stateValue:
+      mapping: B2_ENABLED
+    errorValue: B2_ERROR_VALUE
+    clickable:
+      deviceId: B2
+      command: pumpStartStop
+  - placeholderString: Flow
+    name: Flow
+    errorValue: FLOW_ERROR_VALUE
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/FlowMeter-state{{ state }}.svg"
+    values:
+      flow:
+        mapping: FLOW_VALUE
+        unitPrefixes: m
+        unit: mol/s
+  - placeholderString: circulation-main-pump
+    name: R1
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/PumpRL-Plain-state{{ state }}.svg"
+  - placeholderString: circulation-main-pump-expand
+    name: R1
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: /static/Zoom-stateDefault.svg
+    clickable:
+      expand: system-r1
+  - placeholderString: R1a
+    name: R1a
+    errorValue: R1A_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -13
+    stateImageUrlTemplate: "/static/PumpLR-state{{ state }}.svg"
+    stateValue:
+      mapping: R1A_ENABLED
+    clickable:
+      deviceId: R1A
+      command: pumpStartStop
+  - placeholderString: R2
+    name: R2
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/PumpUD-state{{ state }}.svg"
+    stateValue:
+      mapping: R2_ENABLED
+    errorValue: R2_ERROR_VALUE
+    clickable:
+      deviceId: R2
+      command: pumpStartStop
+  - placeholderString: V001
+    name: V001
+    errorValue: V001_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -7
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V001_ENABLED
+    clickable:
+      deviceId: V001
+      command: valveOnOff
+  - placeholderString: V003
+    name: V003
+    errorValue: V003_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -8
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V003_ENABLED
+    clickable:
+      deviceId: V003
+      command: valveOnOff
+  - placeholderString: V004
+    name: V004
+    errorValue: V004_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -7
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V004_ENABLED
+    clickable:
+      deviceId: V004
+      command: valveOnOff
+  - placeholderString: V005
+    name: V005
+    errorValue: V005_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V005_ENABLED
+    clickable:
+      deviceId: V005
+      command: valveOnOff
+  - placeholderString: V101
+    name: V101
+    errorValue: V101_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -8
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V101_ENABLED
+    clickable:
+      deviceId: V101
+      command: valveOnOff
+  - placeholderString: V102
+    name: V102
+    errorValue: V102_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -13
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V102_ENABLED
+    clickable:
+      deviceId: V102
+      command: valveOnOff
+      critical: true
+  - placeholderString: V104
+    name: V104
+    errorValue: V104_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -2
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V104_ENABLED
+    clickable:
+      deviceId: V104
+      command: valveOnOff
+  - placeholderString: V105
+    name: V105
+    errorValue: V105_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -2
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V105_ENABLED
+    clickable:
+      deviceId: V105
+      command: valveOnOff
+  - placeholderString: V106
+    name: V106
+    errorValue: V106_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V106_ENABLED
+    clickable:
+      deviceId: V106
+      command: valveOnOff
+  - placeholderString: V107
+    name: V107
+    errorValue: V107_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -2
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V107_ENABLED
+    clickable:
+      deviceId: V107
+      command: valveOnOff
+  - placeholderString: V108
+    name: V108
+    errorValue: V108_ERROR_VALUE
+    offset:
+      x: 14
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V108_ENABLED
+    clickable:
+      deviceId: V108
+      command: valveOnOff
+  - placeholderString: V109
+    name: V109
+    errorValue: V109_ERROR_VALUE
+    offset:
+      x: 14
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V109_ENABLED
+    clickable:
+      deviceId: V109
+      command: valveOnOff
+  - placeholderString: V110
+    name: V110
+    errorValue: V110_ERROR_VALUE
+    offset:
+      x: 14
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V110_ENABLED
+    clickable:
+      deviceId: V110
+      command: valveOnOff
+  - placeholderString: V111
+    name: V111
+    errorValue: V111_ERROR_VALUE
+    offset:
+      x: 14
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V111_ENABLED
+    clickable:
+      deviceId: V111
+      command: valveOnOff
+  - placeholderString: V112
+    name: V112
+    errorValue: V112_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -13
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V112_ENABLED
+    clickable:
+      deviceId: V112
+      command: valveOnOff
+      critical: true
+  - placeholderString: V113
+    name: V113
+    errorValue: V113_ERROR_VALUE
+    offset:
+      x: 14
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V113_ENABLED
+    clickable:
+      deviceId: V113
+      command: valveOnOff
+      critical: true
+  - placeholderString: V114
+    name: V114
+    errorValue: V114_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -13
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V114_ENABLED
+    clickable:
+      deviceId: V114
+      command: valveOnOff
+      critical: true
+  - placeholderString: V201G
+    name: V201g
+    errorValue: V201G_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V201G_ENABLED
+    clickable:
+      deviceId: V201G
+      command: valveOnOff
+  - placeholderString: V202
+    name: V202
+    errorValue: V202_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -13
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V202_ENABLED
+    clickable:
+      deviceId: V202
+      command: valveOnOff
+  - placeholderString: V203
+    name: V203
+    errorValue: V203_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -12
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V203_ENABLED
+    clickable:
+      deviceId: V203
+      command: valveOnOff
+  - placeholderString: V403
+    name: V403
+    errorValue: V403_ERROR_VALUE
+    offset:
+      x: 14
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V403_ENABLED
+    clickable:
+      deviceId: V403
+      command: valveOnOff
+  - placeholderString: V401
+    name: V401
+    errorValue: V401_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V401_ENABLED
+    clickable:
+      deviceId: V401
+      command: valveOnOff
+  - placeholderString: V402
+    name: V402
+    errorValue: V402_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V402_ENABLED
+    clickable:
+      deviceId: V402
+      command: valveOnOff
+  - placeholderString: V404
+    name: V404
+    errorValue: V404_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -13
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V404_ENABLED
+    clickable:
+      deviceId: V404
+      command: valveOnOff
+      critical: true
+  - placeholderString: V405
+    name: V405
+    errorValue: V405_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V405_ENABLED
+    clickable:
+      deviceId: V405
+      command: valveOnOff
+  - placeholderString: V406
+    name: V406
+    errorValue: V406_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -13
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V406_ENABLED
+    clickable:
+      deviceId: V406
+      command: valveOnOff
+      critical: true
+  - placeholderString: V407
+    name: V407
+    errorValue: V407_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V407_ENABLED
+    clickable:
+      deviceId: V407
+      command: valveOnOff
+  - placeholderString: V501H
+    name: V501h
+    errorValue: V501H_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -7
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V501H_ENABLED
+    clickable:
+      deviceId: V501H
+      command: valveOnOff
+  - placeholderString: V502H
+    name: V502h
+    errorValue: V502H_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V502H_ENABLED
+    clickable:
+      deviceId: V502H
+      command: valveOnOff
+  - placeholderString: V503H
+    name: V503h
+    errorValue: V503H_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -8
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V503H_ENABLED
+    clickable:
+      deviceId: V503H
+      command: valveOnOff
+  - placeholderString: VCOM
+    name: COM
+    errorValue: COM_ERROR_VALUE
+    offset:
+      x: 10
+      "y": -7
+    stateImageUrlTemplate: "/static/PumpDU-state{{ state }}.svg"
+    stateValue:
+      mapping: COM_ENABLED
+    clickable:
+      deviceId: COM
+      command: pumpStartStop
+  - name: B1a
+    placeholderString: B1a
+    stateImageUrlTemplate: "/static/Trend-caret-state{{ state }}.svg"
+    stateValue:
+      mapping: B1A_POWER
+      compute: delta
+    offset:
+      x: 0
+      "y": -4
+  - name: B1b
+    placeholderString: B1b
+    stateImageUrlTemplate: "/static/Trend-caret-state{{ state }}.svg"
+    stateValue:
+      mapping: B1B_POWER
+      compute: delta
+    offset:
+      x: 0
+      "y": -4
+  - placeholderString: double-cond-lines-expand
+    name: double-cond-lines-expand
+    offset:
+      x: -6
+      "y": 0
+    stateImageUrlTemplate: /static/Zoom-stateDefault.svg
+    clickable:
+      expand: system-double-cond-lines
+  - name: B1a-value
+    placeholderString: B1a-Value
+    stateImageUrlTemplate: "/static/Turbo-B1a-state{{ state }}.svg"
+    values:
+      power:
+        title: B1a
+        mapping: B1A_POWER
+        unit: W
+    errorValue: B1A_ERROR_VALUE
+  - name: B1b-value
+    placeholderString: B1b-Value
+    stateImageUrlTemplate: "/static/Turbo-B1b-state{{ state }}.svg"
+    values:
+      power:
+        title: B1b
+        mapping: B1B_POWER
+        unit: W
+    errorValue: B1B_ERROR_VALUE
+  values:
+    B1a-speed:
+      value:
+        title: B1a
+        mapping: B1A_POWER
+        unit: W
+    B1b-speed:
+      value:
+        title: B1b
+        mapping: B1B_POWER
+        unit: W
+    Turbo:
+      value:
+        title: B1
+    circulation-main-pump:
+      value:
+        title: R1
+    helium-tank:
+      value:
+        mapping: HELIUM_TANK_VALUE
+        unit: '%'
+system-b1:
+  name: Booster unit
+  backgroundImageUrl: /static/Background-GHS-250-400-1000--zoom-B1.svg
+  devices:
+  - placeholderString: P1
+    name: P1
+    offset:
+      x: 50
+      "y": -6
+    stateImageUrlTemplate: "/static/Pressure-large-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P1_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P1_ERROR_VALUE
+  - placeholderString: P1-Switch
+    name: P1
+    errorValue: P1_ERROR_VALUE
+    offset:
+      x: 15
+      "y": 0
+    stateImageUrlTemplate: "/static/SwitchComponent-state{{ state }}.svg"
+    stateValue:
+      mapping: P1_ENABLED
+    clickable:
+      deviceId: P1
+      command: activateColdCathode
+      value: true
+  - placeholderString: P2
+    name: P2
+    offset:
+      x: 0
+      "y": 4
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P2_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P2_ERROR_VALUE
+  - placeholderString: P6
+    name: P6
+    offset:
+      x: 8
+      "y": -7
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P6_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P6_ERROR_VALUE
+  - placeholderString: V101
+    name: V101
+    errorValue: V101_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V101_ENABLED
+    clickable:
+      deviceId: V101
+      command: valveOnOff
+  - placeholderString: V102
+    name: V102
+    errorValue: V102_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -13
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V102_ENABLED
+    clickable:
+      deviceId: V102
+      command: valveOnOff
+      critical: true
+  - placeholderString: V104
+    name: V104
+    errorValue: V104_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V104_ENABLED
+    clickable:
+      deviceId: V104
+      command: valveOnOff
+  - placeholderString: V105
+    name: V105
+    errorValue: V105_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V105_ENABLED
+    clickable:
+      deviceId: V105
+      command: valveOnOff
+  - placeholderString: V107
+    name: V107
+    errorValue: V107_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V107_ENABLED
+    clickable:
+      deviceId: V107
+      command: valveOnOff
+  - placeholderString: V108
+    name: V108
+    errorValue: V108_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V108_ENABLED
+    clickable:
+      deviceId: V108
+      command: valveOnOff
+  - placeholderString: V109
+    name: V109
+    errorValue: V109_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V109_ENABLED
+    clickable:
+      deviceId: V109
+      command: valveOnOff
+  - placeholderString: V110
+    name: V110
+    errorValue: V110_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V110_ENABLED
+    clickable:
+      deviceId: V110
+      command: valveOnOff
+  - placeholderString: V111
+    name: V111
+    errorValue: V111_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V111_ENABLED
+    clickable:
+      deviceId: V111
+      command: valveOnOff
+  - placeholderString: V112
+    name: V112
+    errorValue: V112_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -8
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V112_ENABLED
+    clickable:
+      deviceId: V112
+      command: valveOnOff
+      critical: true
+  - placeholderString: V113
+    name: V113
+    errorValue: V113_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V113_ENABLED
+    clickable:
+      deviceId: V113
+      command: valveOnOff
+      critical: true
+  - placeholderString: V114
+    name: V114
+    errorValue: V114_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -8
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V114_ENABLED
+    clickable:
+      deviceId: V114
+      command: valveOnOff
+      critical: true
+  - placeholderString: R2
+    name: R2
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/PumpUD-state{{ state }}.svg"
+    stateValue:
+      mapping: R2_ENABLED
+    errorValue: R2_ERROR_VALUE
+    clickable:
+      deviceId: R2
+      command: pumpStartStop
+  - placeholderString: V201g
+    name: V201g
+    errorValue: V201G_ERROR_VALUE
+    offset:
+      x: 9.5
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V201G_ENABLED
+    clickable:
+      deviceId: V201G
+      command: valveOnOff
+  - placeholderString: V202
+    name: V202
+    errorValue: V202_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -8
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V202_ENABLED
+    clickable:
+      deviceId: V202
+      command: valveOnOff
+  - placeholderString: V203
+    name: V203
+    errorValue: V203_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V203_ENABLED
+    clickable:
+      deviceId: V203
+      command: valveOnOff
+  - placeholderString: V204no
+    name: V204no
+    errorValue: V204NO_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V204NO_ENABLED
+    clickable:
+      deviceId: V204NO
+      command: valveOnOff
+  - placeholderString: V205no
+    name: V205no
+    errorValue: V205NO_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V205NO_ENABLED
+    clickable:
+      deviceId: V205NO
+      command: valveOnOff
+  - placeholderString: B1a
+    name: B1a
+    errorValue: B1A_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -7
+    stateImageUrlTemplate: "/static/PumpUD-state{{ state }}.svg"
+    stateValue:
+      mapping: B1A_ENABLED
+    clickable:
+      deviceId: B1A
+      command: pumpStartStop
+  - placeholderString: B1b
+    name: B1b
+    errorValue: B1B_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -7
+    stateImageUrlTemplate: "/static/PumpUD-state{{ state }}.svg"
+    stateValue:
+      mapping: B1B_ENABLED
+    clickable:
+      deviceId: B1B
+      command: pumpStartStop
+system-r1:
+  name: Redundant main circulation pump unit
+  backgroundImageUrl: /static/Background-GHS-250-400-1000--zoom-R1.svg
+  devices:
+  - placeholderString: P4
+    name: P4
+    offset:
+      x: 30
+      "y": -5
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P4_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P4_ERROR_VALUE
+  - placeholderString: P5
+    name: P5
+    offset:
+      x: 0
+      "y": -5
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P5_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P5_ERROR_VALUE
+  - placeholderString: P7
+    name: P7
+    offset:
+      x: 3
+      "y": -5
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P7_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P7_ERROR_VALUE
+  - placeholderString: V001
+    name: V001
+    errorValue: V001_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -7
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V001_ENABLED
+    clickable:
+      deviceId: V001
+      command: valveOnOff
+  - placeholderString: V003
+    name: V003
+    errorValue: V003_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -7
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V003_ENABLED
+    clickable:
+      deviceId: V003
+      command: valveOnOff
+  - placeholderString: V004
+    name: V004
+    errorValue: V004_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -7
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V004_ENABLED
+    clickable:
+      deviceId: V004
+      command: valveOnOff
+  - placeholderString: V005
+    name: V005
+    errorValue: V005_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V005_ENABLED
+    clickable:
+      deviceId: V005
+      command: valveOnOff
+  - placeholderString: V114
+    name: V114
+    errorValue: V114_ERROR_VALUE
+    offset:
+      x: 13
+      "y": -7
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V114_ENABLED
+    clickable:
+      deviceId: V114
+      command: valveOnOff
+      critical: true
+  - placeholderString: V301
+    name: V301
+    errorValue: V301_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V301_ENABLED
+    clickable:
+      deviceId: V301
+      command: valveOnOff
+  - placeholderString: V302
+    name: V302
+    errorValue: V302_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -13
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V302_ENABLED
+    clickable:
+      deviceId: V302
+      command: valveOnOff
+  - placeholderString: V303
+    name: V303
+    errorValue: V303_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V303_ENABLED
+    clickable:
+      deviceId: V303
+      command: valveOnOff
+      critical: true
+  - placeholderString: V304
+    name: V304
+    errorValue: V304_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -13
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V304_ENABLED
+    clickable:
+      deviceId: V304
+      command: valveOnOff
+  - placeholderString: V305
+    name: V305
+    errorValue: V305_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V305_ENABLED
+    clickable:
+      deviceId: V305
+      command: valveOnOff
+  - placeholderString: V306
+    name: V306
+    errorValue: V306_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V306_ENABLED
+    clickable:
+      deviceId: V306
+      command: valveOnOff
+      critical: true
+  - placeholderString: V403
+    name: V403
+    errorValue: V403_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V403_ENABLED
+    clickable:
+      deviceId: V403
+      command: valveOnOff
+  - placeholderString: R1a
+    name: R1a
+    errorValue: R1A_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -13
+    stateImageUrlTemplate: "/static/PumpLR-state{{ state }}.svg"
+    stateValue:
+      mapping: R1A_ENABLED
+    clickable:
+      deviceId: R1A
+      command: pumpStartStop
+  - placeholderString: R1b
+    name: R1b
+    errorValue: R1B_ERROR_VALUE
+    offset:
+      x: 13.5
+      "y": -13
+    stateImageUrlTemplate: "/static/PumpLR-state{{ state }}.svg"
+    stateValue:
+      mapping: R1B_ENABLED
+    clickable:
+      deviceId: R1B
+      command: pumpStartStop
+  values:
+    helium-tank:
+      value:
+        mapping: HELIUM_TANK_VALUE
+        unit: '%'
+system-double-cond-lines:
+  name: Double condensing lines
+  backgroundImageUrl: /static/Background-GHS-250-400-1000--zoom-double-cond-lines.svg
+  devices:
+  - placeholderString: V504h
+    name: V504h
+    errorValue: V504H_ERROR_VALUE
+    offset:
+      x: 14
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V504H_ENABLED
+    clickable:
+      deviceId: V504H
+      command: valveOnOff
+      critical: false
+  - placeholderString: V505h
+    name: V505h
+    errorValue: V505H_ERROR_VALUE
+    offset:
+      x: 9
+      "y": -7
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V505H_ENABLED
+    clickable:
+      deviceId: V505H
+      command: valveOnOff
+      critical: false
+system-info-box:
+  name: System info box
+  groups:
+  - title: Controls
+    elements:
+    - title: Pulse tube
+      clickable:
+        deviceId: PULSE_TUBE
+        command: pulseTubeStartStop
+        mapping: PULSE_TUBE_ENABLED
+    - title: Turbo pump
+      clickable:
+        deviceId: TURBO_PUMP
+        command: turboPumpsStartStop
+        mapping: TURBO_PUMP_ENABLED
+  - title: Heaters
+    elements:
+    - title: 4K heater 1
+      clickable:
+        deviceId: 4K_HEATER_1_ENABLED
+        command: heaterOnOff
+        mapping: 4K_HEATER_1_ENABLED
+    - title: 4K heater 2
+      clickable:
+        deviceId: 4K_HEATER_2_ENABLED
+        command: heaterOnOff
+        mapping: 4K_HEATER_2_ENABLED
+    - title: 4K heater 3
+      clickable:
+        deviceId: 4K_HEATER_3_ENABLED
+        command: heaterOnOff
+        mapping: 4K_HEATER_3_ENABLED
+    - title: 4K heater 4
+      clickable:
+        deviceId: 4K_HEATER_4_ENABLED
+        command: heaterOnOff
+        mapping: 4K_HEATER_4_ENABLED
+    - title: Still heat switch
+      clickable:
+        deviceId: HEATSWITCH_STILL
+        command: heaterOnOff
+        mapping: HEATSWITCH_STILL_ENABLED
+    - title: MXC heat switch
+      clickable:
+        deviceId: HEATSWITCH_MXC
+        command: heaterOnOff
+        mapping: HEATSWITCH_MXC_ENABLED
+    - title: Still heater
+      value:
+        mapping: STILL_HEATING_POWER
+        unit: W
+      clickable:
+        deviceId: STILL_HEATER
+        command: heaterOnOff
+        mapping: STILL_HEATER_ENABLED
+    - title: MXC heater
+      value:
+        mapping: MXC_HEATING_POWER
+        unit: W
+      clickable:
+        deviceId: MXC_HEATER
+        command: heaterOnOff
+        mapping: MXC_HEATER_ENABLED
+    - title: FSE
+      value:
+        mapping: FSE_HEATING_POWER
+        unit: W
+      clickable:
+        deviceId: FSE_HEATER
+        command: heaterOnOff
+        mapping: FSE_HEATER_ENABLED
+  - title: Temperatures
+    elements:
+    - title: 50K flange
+      value:
+        mapping: 50K_TEMPERATURE
+        unit: K
+      stateValue:
+        mapping: 50K_TEMPERATURE
+        compute: delta
+    - title: 4K flange
+      value:
+        mapping: 4K_TEMPERATURE
+        unit: K
+      stateValue:
+        mapping: 4K_TEMPERATURE
+        compute: delta
+    - title: Still flange
+      value:
+        mapping: STILL_TEMPERATURE
+        unit: K
+      stateValue:
+        mapping: STILL_TEMPERATURE
+        compute: delta
+    - title: MXC flange
+      value:
+        mapping: MXC_TEMPERATURE
+        unit: K
+      stateValue:
+        mapping: MXC_TEMPERATURE
+        compute: delta
+    - title: FSE
+      value:
+        mapping: FSE_TEMPERATURE
+        unit: K
+      stateValue:
+        mapping: FSE_TEMPERATURE
+        compute: delta
+dashboard-cryostat:
+  name: Cryostat
+  backgroundImageUrl: /static/Cryostat-backgroundImage.svg
+  values:
+    P1:
+      errorValue: P1_ERROR_VALUE
+      value:
+        title: P1
+        mapping: P1_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    P2:
+      errorValue: P2_ERROR_VALUE
+      value:
+        title: P2
+        mapping: P2_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    P3:
+      errorValue: P3_ERROR_VALUE
+      value:
+        title: P3
+        mapping: P3_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    FiftyK-Flange:
+      value:
+        title: 50K flange
+        mapping: 50K_TEMPERATURE
+        unit: K
+    FourK-Flange:
+      value:
+        title: 4K flange
+        mapping: 4K_TEMPERATURE
+        unit: K
+    Still-Flange:
+      value:
+        title: Still flange
+        mapping: STILL_TEMPERATURE
+        unit: K
+    MXC-Flange:
+      value:
+        title: MXC flange
+        mapping: MXC_TEMPERATURE
+        unit: K
+    Flow:
+      value:
+        title: Flow
+        mapping: FLOW_VALUE
+        unitPrefixes: m
+        unit: mol/s
+      align:
+      - rightSides
+      - Flow-title-placeholder
+    Heater-1:
+      value:
+        title: 4K heater
+        mapping: 4K_HEATER_1_ENABLED
+        unit: ""
+      align:
+      - rightSides
+      - Heater-1-title-placeholder
+    Heater-2:
+      value:
+        title: Still heater power
+        mapping: STILL_HEATING_POWER
+        unit: W
+      align:
+      - rightSides
+      - Heater-2-title-placeholder
+    Heater-3:
+      value:
+        title: MXC heater power
+        mapping: MXC_HEATING_POWER
+        unit: W
+      align:
+      - rightSides
+      - Heater-3-title-placeholder
+    Heat-Switch-2:
+      value:
+        title: MXC heat switch
+        mapping: HEATSWITCH_MXC_ENABLED
+        unit: ""
+    Heat-Switch-1:
+      value:
+        title: Still heat switch
+        mapping: HEATSWITCH_STILL_ENABLED
+        unit: ""
+    Pulse-Tube:
+      value:
+        title: Pulse tube
+        mapping: PULSE_TUBE_ENABLED
+        unit: ""
+      align:
+      - rightSides
+      - Pulse-Tube-title-placeholder
+  devices:
+  - clickable: false
+    name: Still heat switch
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Switch-state{{ state }}.svg"
+    placeholderString: Heat-Switch-1-circle
+    stateValue:
+      mapping: HEATSWITCH_STILL_ENABLED
+  - clickable: false
+    name: MXC heat switch
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Switch-state{{ state }}.svg"
+    placeholderString: Heat-Switch-2-circle
+    stateValue:
+      mapping: HEATSWITCH_MXC_ENABLED
+  - clickable: false
+    name: Pulse tube
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Switch-state{{ state }}.svg"
+    placeholderString: Pulse-Tube-circle
+    stateValue:
+      mapping: PULSE_TUBE_ENABLED
+  - clickable: false
+    name: Pulse tube
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Switch-state{{ state }}.svg"
+    placeholderString: Pulse-Tube-2-circle
+    stateValue:
+      mapping: PULSE_TUBE_ENABLED
+  - clickable: false
+    name: 4K heater
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Switch-state{{ state }}.svg"
+    placeholderString: Heater-1-circle
+    stateValue:
+      mapping: 4K_HEATER_1_ENABLED
+  - clickable: false
+    name: Still heater
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Switch-state{{ state }}.svg"
+    placeholderString: Heater-2-circle
+    stateValue:
+      mapping: STILL_HEATER_ENABLED
+  - clickable: false
+    name: MXC heater
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Switch-state{{ state }}.svg"
+    placeholderString: Heater-3-circle
+    stateValue:
+      mapping: MXC_HEATER_ENABLED
+  - clickable: false
+    name: Trend
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Trend-caret-state{{ state }}.svg"
+    placeholderString: P1-trend
+    stateValue:
+      mapping: P1_PRESSURE
+      compute: delta
+  - clickable: false
+    name: Trend
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Trend-caret-state{{ state }}.svg"
+    placeholderString: P2-trend
+    stateValue:
+      mapping: P2_PRESSURE
+      compute: delta
+  - clickable: false
+    name: Trend
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Trend-caret-state{{ state }}.svg"
+    placeholderString: P3-trend
+    stateValue:
+      mapping: P3_PRESSURE
+      compute: delta
+  - clickable: false
+    name: Trend
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Trend-caret-state{{ state }}.svg"
+    placeholderString: FiftyK-Flange-trend
+    stateValue:
+      mapping: 50K_TEMPERATURE
+      compute: delta
+  - clickable: false
+    name: Trend
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Trend-caret-state{{ state }}.svg"
+    placeholderString: FourK-Flange-trend
+    stateValue:
+      mapping: 4K_TEMPERATURE
+      compute: delta
+  - clickable: false
+    name: Trend
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Trend-caret-state{{ state }}.svg"
+    placeholderString: Still-Flange-trend
+    stateValue:
+      mapping: STILL_TEMPERATURE
+      compute: delta
+  - clickable: false
+    name: Trend
+    offset:
+      x: 0
+      "y": 0
+    stateImageUrlTemplate: "/static/Trend-caret-state{{ state }}.svg"
+    placeholderString: MXC-Flange-trend
+    stateValue:
+      mapping: MXC_TEMPERATURE
+      compute: delta
+dashboard-temperature-control:
+  name: Dashboard temperature control
+  groups:
+  - title: Mixing chamber
+    values:
+      UI-TEMPERATURE:
+        title: Temperature
+        mapping: MXC_TEMPERATURE
+        unit: K
+      UI-TEMPERATURE-DELTA:
+        mapping: MXC_TEMPERATURE
+        unit: K
+        compute: delta
+      UI-TARGET-TEMPERATURE:
+        mapping: MXC_TARGET_TEMPERATURE
+        unit: K
+      UI-TARGET-TEMPERATURE-ENABLED:
+        mapping: MXC_TARGET_TEMPERATURE_ENABLED
+        unit: ""
+      UI-HEATING-POWER:
+        mapping: MXC_HEATING_POWER
+        unit: W
+      UI-HEATER-ENABLED:
+        mapping: MXC_HEATER_ENABLED
+        unit: ""
+  - title: FSE
+    values:
+      UI-TEMPERATURE:
+        title: Temperature
+        mapping: FSE_TEMPERATURE
+        unit: K
+      UI-TEMPERATURE-DELTA:
+        mapping: FSE_TEMPERATURE
+        unit: K
+        compute: delta
+      UI-TARGET-TEMPERATURE:
+        mapping: FSE_TARGET_TEMPERATURE
+        unit: K
+      UI-TARGET-TEMPERATURE-ENABLED:
+        mapping: FSE_TARGET_TEMPERATURE_ENABLED
+        unit: ""
+      UI-HEATING-POWER:
+        mapping: FSE_HEATING_POWER
+        unit: W
+      UI-HEATER-ENABLED:
+        mapping: FSE_HEATER_ENABLED
+        unit: ""
+  - title: Still
+    values:
+      UI-TEMPERATURE:
+        title: Temperature
+        mapping: STILL_TEMPERATURE
+        unit: K
+      UI-TEMPERATURE-DELTA:
+        mapping: STILL_TEMPERATURE
+        unit: K
+        compute: delta
+      UI-TARGET-TEMPERATURE:
+        mapping: STILL_TARGET_TEMPERATURE
+        unit: K
+      UI-TARGET-TEMPERATURE-ENABLED:
+        mapping: STILL_TARGET_TEMPERATURE_ENABLED
+        unit: ""
+      UI-HEATING-POWER:
+        mapping: STILL_HEATING_POWER
+        unit: W
+      UI-HEATER-ENABLED:
+        mapping: STILL_HEATER_ENABLED
+        unit: ""
+dataviewer-default-settings:
+  version: ghs-400---v0.7.5
+  tabs:
+  - name: Tab 1
+    twoColumnLayout: true
+    isGlobalTime: true
+    liveMode: true
+    timeRange:
+      type: relative
+      amount: 15
+      unit: minute
+    graphs:
+    - left:
+        category: Pressure-bar
+        items:
+        - P1_PRESSURE
+        - P2_PRESSURE
+        - P3_PRESSURE
+      right:
+        category: Flow-mol/s
+        items:
+        - FLOW_VALUE
+    - left:
+        category: Temperature-K
+        items:
+        - 50K_TEMPERATURE
+        - 4K_TEMPERATURE
+        - STILL_TEMPERATURE
+        - MXC_TEMPERATURE
+dataviewer-value-categories:
+  name: System value categories
+  units:
+  - quantity: Temperature
+    unit: K
+    mappings:
+    - 50K_TEMPERATURE
+    - 4K_TEMPERATURE
+    - B1_TEMPERATURE
+    - COOLING_WATER_TEMPERATURE
+    - STILL_TEMPERATURE
+    - MXC_TEMPERATURE
+  - quantity: Flow
+    unit: mol/s
+    unitPrefixes: m
+    mappings:
+    - FLOW_VALUE
+  - quantity: Pressure
+    unit: bar
+    unitPrefixes: m
+    mappings:
+    - P1_PRESSURE
+    - P2_PRESSURE
+    - P3_PRESSURE
+    - P4_PRESSURE
+    - P5_PRESSURE
+    - P6_PRESSURE
+    - P7_PRESSURE
+    - P8_PRESSURE
+  - quantity: Speed
+    unit: Hz
+    mappings:
+    - B1A_SPEED
+    - B1B_SPEED
+    - B1C_SPEED
+    - B2_SPEED
+  - quantity: Power
+    unit: W
+    mappings:
+    - B1A_POWER
+    - B1B_POWER
+    - B1C_POWER
+    - MXC_HEATING_POWER
+    - STILL_HEATING_POWER
+    - FSE_HEATING_POWER
+    - R1A_PUMP_POWER
+    - R2_PUMP_POWER
+    - COM_PUMP_POWER
+  - quantity: Distance
+    unit: m
+    mappings:
+    - FSE_ACTUAL_POSITION
+    - FSE_TARGET_POSITION
+  diagrams:
+  - id: system-diagram
+    name: GHS-400
+  - id: system-b1
+    name: Booster unit
+  - id: system-r1
+    name: Redundant main circulation pump unit
+dataviewer-info-box:
+  name: Info box data
+  groups:
+  - title: Heating power
+    elements:
+    - value:
+        mapping: 4K_HEATING_POWER
+        unit: W
+      title: 4K flange
+    - value:
+        mapping: STILL_HEATING_POWER
+        unit: W
+      title: Still flange
+    - value:
+        mapping: MXC_HEATING_POWER
+        unit: W
+      title: MXC flange
+  - title: Temperatures
+    elements:
+    - value:
+        mapping: 50K_TEMPERATURE
+        unit: K
+      title: 50K flange
+    - value:
+        mapping: 4K_TEMPERATURE
+        unit: K
+      title: 4K flange
+    - value:
+        mapping: STILL_TEMPERATURE
+        unit: K
+      title: Still flange
+    - value:
+        mapping: MXC_TEMPERATURE
+        unit: K
+      title: MXC flange
+#fse:
+ # name: FSE status
+ # groups:
+  #- title: FSE
+  #  elements:
+   # - title: FSE motor status
+   #   value:
+    #    mapping: FSE_MOTOR_STATUS
+    #- title: State
+    #  value:
+#        mapping: FSE_ENABLED
+ #   - title: FSE error
+  #    value:
+   #     mapping: FSE_ERROR
+    #- title: Cryostat
+     # value:
+      #  mapping: FSE_MOUNTED
+#    - title: Target position
+ #     value:
+  #      mapping: FSE_TARGET_POSITION
+   #     unitPrefixes: m
+    #    unit: m
+    #- title: Actual position
+#      value:
+ #       mapping: FSE_ACTUAL_POSITION
+  #      unitPrefixes: m
+   #     unit: m
+#system-fse:
+ # name: FSE system diagram
+  #backgroundImageUrl: /static/System-FSE-backgroundImage.svg
+  devices:
+  - placeholderString: B2
+    name: B2
+    offset:
+      x: 14
+      "y": -13
+    stateImageUrlTemplate: "/static/PumpUD-state{{ state }}.svg"
+    stateValue:
+      mapping: B2_ENABLED
+    errorValue: B2_ERROR_VALUE
+    clickable:
+      deviceId: B2
+      command: pumpStartStop
+  - placeholderString: R2
+    name: R2
+    offset:
+      x: 15
+      "y": -11
+    stateImageUrlTemplate: "/static/PumpUD-state{{ state }}.svg"
+    stateValue:
+      mapping: R2_ENABLED
+    errorValue: R2_ERROR_VALUE
+    clickable:
+      deviceId: R2
+      command: pumpStartStop
+  - placeholderString: V101
+    name: V101
+    errorValue: V101_ERROR_VALUE
+    offset:
+      x: 14
+      "y": -13
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V101_ENABLED
+    clickable:
+      deviceId: V101
+      command: valveOnOff
+  - placeholderString: V102
+    name: V102
+    errorValue: V102_ERROR_VALUE
+    offset:
+      x: 14
+      "y": -13
+    stateImageUrlTemplate: "/static/ValveV-state{{ state }}.svg"
+    stateValue:
+      mapping: V102_ENABLED
+    clickable:
+      deviceId: V102
+      command: valveOnOff
+  - placeholderString: V104
+    name: V104
+    offset:
+      x: 14
+      "y": -13
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V104_ENABLED
+    errorValue: V104_ERROR_VALUE
+    clickable:
+      deviceId: V104
+      command: valveOnOff
+  - placeholderString: V105
+    name: V105
+    offset:
+      x: 14
+      "y": -13
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V105_ENABLED
+    errorValue: V105_ERROR_VALUE
+    clickable:
+      deviceId: V105
+      command: valveOnOff
+  - placeholderString: V106
+    name: V106
+    offset:
+      x: 14
+      "y": -13
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V106_ENABLED
+    errorValue: V106_ERROR_VALUE
+    clickable:
+      deviceId: V106
+      command: valveOnOff
+  - placeholderString: V107
+    name: V107
+    offset:
+      x: 14
+      "y": -13
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V107_ENABLED
+    errorValue: V107_ERROR_VALUE
+    clickable:
+      deviceId: V107
+      command: valveOnOff
+  - placeholderString: V108
+    name: V108
+    offset:
+      x: 14
+      "y": -13
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V108_ENABLED
+    errorValue: V108_ERROR_VALUE
+    clickable:
+      deviceId: V108
+      command: valveOnOff
+#  - placeholderString: V109
+ #   name: V109
+  #  offset:
+   #   x: 14
+    #  "y": -13
+#    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+ #   stateValue:
+  #    mapping: V109_ENABLED
+   # errorValue: V109_ERROR_VALUE
+    #clickable:
+#      deviceId: V109
+ #     command: valveOnOff
+  - placeholderString: V110
+    name: V110
+    offset:
+      x: 14
+      "y": -13
+    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+    stateValue:
+      mapping: V110_ENABLED
+    errorValue: V110_ERROR_VALUE
+    clickable:
+      deviceId: V110
+      command: valveOnOff
+#  - placeholderString: V601G
+ #   name: V601g
+  #  offset:
+   #   x: 14
+    #  "y": -13
+#    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+ #   stateValue:
+  #    mapping: V601G_ENABLED
+   # errorValue: V601G_ERROR_VALUE
+    #clickable:
+     # deviceId: V601G
+      #command: valveOnOff
+#  - placeholderString: V602
+ #   name: V602
+  #  offset:
+   #   x: 14
+    #  "y": -10
+#    stateImageUrlTemplate: "/static/Valve-state{{ state }}.svg"
+ #   stateValue:
+  #    mapping: V602_ENABLED
+   # errorValue: V602_ERROR_VALUE
+    #clickable:
+     # deviceId: V602
+      #command: valveOnOff
+  - placeholderString: P1
+    name: P1
+    offset:
+      x: 25
+      "y": -5
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P1_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P1_ERROR_VALUE
+  - placeholderString: P6
+    name: P6
+    offset:
+      x: 15
+      "y": -5
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P6_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P6_ERROR_VALUE
+  - placeholderString: P8
+    name: P8
+    offset:
+      x: 0
+      "y": -5
+    stateImageUrlTemplate: "/static/Pressure-state{{ state }}.svg"
+    values:
+      pressure:
+        mapping: P8_PRESSURE
+        unitPrefixes: m
+        unit: bar
+    errorValue: P8_ERROR_VALUE
+#fse-temperature-control:
+ # name: FSE temperature control
+  #groups:
+  #- title: FSE
+   # values:
+    #  UI-TEMPERATURE:
+     #   title: Temperature
+      #  mapping: FSE_TEMPERATURE
+       # unit: K
+#      UI-TEMPERATURE-DELTA:
+ #       mapping: FSE_TEMPERATURE
+  #      unit: K
+   #     compute: delta
+    #  UI-TARGET-TEMPERATURE:
+     #   mapping: FSE_TARGET_TEMPERATURE
+      #  unit: K
+#      UI-TARGET-TEMPERATURE-ENABLED:
+ #       mapping: FSE_TARGET_TEMPERATURE_ENABLED
+  #      unit: ""
+   #   UI-HEATING-POWER:
+    #    mapping: FSE_HEATING_POWER
+     #   unit: W
+      #UI-HEATER-ENABLED:
+       # mapping: FSE_HEATER_ENABLED
+        #unit: ""
+  - title: Mixing chamber
+    values:
+      UI-TEMPERATURE:
+        title: Temperature
+        mapping: MXC_TEMPERATURE
+        unit: K
+      UI-TEMPERATURE-DELTA:
+        mapping: MXC_TEMPERATURE
+        unit: K
+        compute: delta
+      UI-TARGET-TEMPERATURE:
+        mapping: MXC_TARGET_TEMPERATURE
+        unit: K
+      UI-TARGET-TEMPERATURE-ENABLED:
+        mapping: MXC_TARGET_TEMPERATURE_ENABLED
+        unit: ""
+      UI-HEATING-POWER:
+        mapping: MXC_HEATING_POWER
+        unit: W
+      UI-HEATER-ENABLED:
+        mapping: MXC_HEATER_ENABLED
+        unit: ""
+  - title: Still
+    values:
+      UI-TEMPERATURE:
+        title: Temperature
+        mapping: STILL_TEMPERATURE
+        unit: K
+      UI-TEMPERATURE-DELTA:
+        mapping: STILL_TEMPERATURE
+        unit: K
+        compute: delta
+      UI-TARGET-TEMPERATURE:
+        mapping: STILL_TARGET_TEMPERATURE
+        unit: K
+      UI-TARGET-TEMPERATURE-ENABLED:
+        mapping: STILL_TARGET_TEMPERATURE_ENABLED
+        unit: ""
+      UI-HEATING-POWER:
+        mapping: STILL_HEATING_POWER
+        unit: W
+      UI-HEATER-ENABLED:
+        mapping: STILL_HEATER_ENABLED
+        unit: ""
+#fse-image:
+ # name: FSE Image
+  #imageUrls:
+   # base: /images/FSE-base.png
+    #cryostat: /images/FSE-cryostat.png
+    #insert: /images/FSE-insert.png
+    #gateValve: /images/FSE-fate_valve.png
+  #groups:
+#  - title: FSE Mappings
+ #   values:
+  #    FSE_MOUNTED:
+   #     mapping: FSE_MOUNTED
+    #    unit: ""
+     # FSE_IN_POSITION:
+      #  mapping: FSE_IN_POSITION
+       # unit: ""
+#      FSE_OUT_POSITION:
+ #       mapping: FSE_OUT_POSITION
+  #      unit: ""
+   #   FSE_ACTUAL_POSITION:
+    #    mapping: FSE_ACTUAL_POSITION
+     #   unit: ""
+      #FSE_GATE_VALVE_STATE:
+       # mapping: V601G_ENABLED
+        #unit: ""
