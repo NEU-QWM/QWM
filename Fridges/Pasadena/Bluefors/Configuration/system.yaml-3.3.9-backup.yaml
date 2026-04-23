@@ -1,0 +1,446 @@
+version: 3.3.9
+hardwareGroupSettings:
+  plc:
+    host: 172.31.255.23
+    port: 4840
+    dataInterval: 1s
+devices:
+- id: plc.Pulsetube1
+  name: Pulse tube 1
+  uiGroupName: Pulse tubes
+  deviceType: Cryomech-CPAXXXX
+  hardwareGroupSetting: plc
+  settings:
+    identifier: Pulsetube1
+  critical: true
+  enabled: true
+- id: plc.IO.FLOW
+  name: Bronkhorst flowmeter
+  uiGroupName: Flowmeter
+  deviceType: Bronkhorst-ELFlow
+  hardwareGroupSetting: plc
+  settings:
+    identifier: IO.FLOW
+  critical: true
+  enabled: true
+- id: plc.Heater4KRelay
+  name: 4K heater relay
+  uiGroupName: Warm-up heaters
+  deviceType: 4KHeaterRelay
+  hardwareGroupSetting: plc
+  settings:
+    identifier: Heater4KRelay
+  critical: false
+  enabled: true
+- id: plc.CoreunitLed
+  name: Core Unit LED
+  uiGroupName: LEDs
+  deviceType: CoreUnitLed
+  hardwareGroupSetting: plc
+  settings:
+    identifier: CoreunitLed
+  critical: false
+  enabled: true
+- id: plc.LN2TrapLed
+  name: LN2 Trap LED
+  uiGroupName: LEDs
+  deviceType: LN2TrapLed
+  hardwareGroupSetting: plc
+  settings:
+    identifier: LN2TrapLed
+  critical: false
+  enabled: true
+- id: plc.IO.P1
+  name: Pfeiffer MPT200 (P1)
+  uiGroupName: Pressure gauges
+  deviceType: Pfeiffer-MPT200
+  hardwareGroupSetting: plc
+  settings:
+    identifier: IO.P1
+  critical: true
+  enabled: true
+- id: plc.IO.P2
+  name: Pfeiffer RPT200 (P2)
+  uiGroupName: Pressure gauges
+  deviceType: Pfeiffer-RPT200
+  hardwareGroupSetting: plc
+  settings:
+    identifier: IO.P2
+  critical: true
+  enabled: true
+- id: plc.IO.P3
+  name: Pfeiffer CPT200 (P3)
+  uiGroupName: Pressure gauges
+  deviceType: Pfeiffer-CPT200
+  hardwareGroupSetting: plc
+  settings:
+    identifier: IO.P3
+  critical: true
+  enabled: true
+- id: plc.IO.P4
+  name: Pfeiffer CPT200 (P4)
+  uiGroupName: Pressure gauges
+  deviceType: Pfeiffer-CPT200
+  hardwareGroupSetting: plc
+  settings:
+    identifier: IO.P4
+  critical: true
+  enabled: true
+- id: plc.IO.P5
+  name: Pfeiffer RPT200 (P5)
+  uiGroupName: Pressure gauges
+  deviceType: Pfeiffer-RPT200
+  hardwareGroupSetting: plc
+  settings:
+    identifier: IO.P5
+  critical: true
+  enabled: true
+- id: plc.IO.P6
+  name: Pfeiffer RPT200 (P6)
+  uiGroupName: Pressure gauges
+  deviceType: Pfeiffer-RPT200
+  hardwareGroupSetting: plc
+  settings:
+    identifier: IO.P6
+  critical: true
+  enabled: true
+- id: plc.IO.P7
+  name: Pfeiffer RPT200(P7)
+  uiGroupName: Pressure gauges
+  deviceType: Pfeiffer-RPT200
+  hardwareGroupSetting: plc
+  settings:
+    identifier: IO.P7
+  critical: true
+  enabled: true
+- id: plc.HeliumCompressor
+  name: Agilent IDP-3 scroll pump (COM)
+  uiGroupName: Pumps
+  deviceType: Agilent-IDP3
+  hardwareGroupSetting: plc
+  settings:
+    identifier: HeliumCompressor
+  critical: true
+  enabled: true
+- id: plc.IO.B1a
+  name: Pfeiffer TC400EC (B1a)
+  uiGroupName: Pumps
+  deviceType: Pfeiffer-TC400EC
+  hardwareGroupSetting: plc
+  settings:
+    identifier: IO.B1a
+  critical: true
+  enabled: true
+- id: plc.IO.B1b
+  name: Pfeiffer TC400EC (B1b)
+  uiGroupName: Pumps
+  deviceType: Pfeiffer-TC400EC
+  hardwareGroupSetting: plc
+  settings:
+    identifier: IO.B1b
+  critical: true
+  enabled: true
+- id: plc.CirculationRoughPump1
+  name: Kashiyama roots pump (R1a)
+  uiGroupName: Pumps
+  deviceType: Kashiyama-NeoDry
+  hardwareGroupSetting: plc
+  settings:
+    identifier: CirculationRoughPump1
+  critical: true
+  enabled: true
+- id: plc.ServiceRoughPump
+  name: Agilent IDP-7 scroll pump (R2)
+  uiGroupName: Pumps
+  deviceType: Agilent-IDP7
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ServiceRoughPump
+  critical: true
+  enabled: true
+- id: plc.GHSDiagnostics
+  name: Diagnostics
+  uiGroupName: GHS
+  deviceType: GHSdiagnostics
+  hardwareGroupSetting: plc
+  settings:
+    identifier: GHSDiagnostics
+  critical: false
+  enabled: true
+- id: plc.CSState
+  name: Automation status
+  uiGroupName: GHS
+  deviceType: CSState
+  hardwareGroupSetting: plc
+  settings:
+    identifier: CSState
+  critical: false
+  enabled: true
+- id: plc.PLCAlarms
+  name: Alarms
+  uiGroupName: GHS
+  deviceType: PLCAlarms
+  hardwareGroupSetting: plc
+  settings:
+    identifier: PLCAlarms
+  critical: true
+  enabled: true
+- id: plc.PLCRemote
+  name: Local control
+  uiGroupName: GHS
+  deviceType: PLCRemote
+  hardwareGroupSetting: plc
+  settings:
+    identifier: PLCRemote
+  critical: false
+  enabled: true
+- id: plc.CoolingWater
+  name: Cooling water
+  uiGroupName: GHS
+  deviceType: CoolingWater
+  hardwareGroupSetting: plc
+  settings:
+    identifier: CoolingWater
+  critical: false
+  enabled: true
+- id: plc.ValveGroup.V001
+  name: V001
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V001
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V003
+  name: V003
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V003
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V004
+  name: V004
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V004
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V005
+  name: V005
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V005
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V101
+  name: V101
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V101
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V102
+  name: V102
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V102
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V104
+  name: V104
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V104
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V105
+  name: V105
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V105
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V108
+  name: V108
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V108
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V110
+  name: V110
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V110
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V111
+  name: V111
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V111
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V112
+  name: V112
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V112
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V113
+  name: V113
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V113
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V114
+  name: V114
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V114
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V201g
+  name: V201g
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V201g
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V202
+  name: V202
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V202
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V203
+  name: V203
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V203
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V401
+  name: V401
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V401
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V402
+  name: V402
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V402
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V403
+  name: V403
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V403
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V501h
+  name: V501h
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V501h
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V502h
+  name: V502h
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V502h
+  critical: true
+  enabled: true
+- id: plc.ValveGroup.V503h
+  name: V503h
+  uiGroupName: Valves
+  deviceType: Valve
+  hardwareGroupSetting: plc
+  settings:
+    identifier: ValveGroup.V503h
+  critical: true
+  enabled: true
+- id: bftc-device-1
+  name: Temperature Controller 1
+  uiGroupName: Temperature control
+  deviceType: TemperatureController
+  settings:
+    host: 172.31.255.31
+    dataInterval: 1s
+  critical: true
+  enabled: true
+- id: pulsetube
+  name: Pulse tube
+  uiGroupName: Virtual devices
+  deviceType: Pulsetube
+  settings:
+    controlledDevices:
+    - plc.Pulsetube1
+  critical: false
+  enabled: true
+- id: turbopump
+  name: Turbo pump
+  uiGroupName: Virtual devices
+  deviceType: Turbopump
+  settings:
+    controlledDevices:
+    - plc.IO.B1a
+    - plc.IO.B1b
+  critical: false
+  enabled: true
+- id: Sentinel
+  name: Sentinel
+  uiGroupName: Sentinel device
+  deviceType: Sentinel
+  critical: false
+  enabled: true

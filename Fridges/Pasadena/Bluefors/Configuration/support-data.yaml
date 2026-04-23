@@ -1,0 +1,672 @@
+version: 3.4.2
+loggers:
+- name: channel1T
+  fileName: CH1 T
+  columns:
+  - time
+  - float bftc-device-1.channels.1.temperature
+  enabled: true
+  interval: 60
+- name: channel1R
+  fileName: CH1 R
+  columns:
+  - time
+  - float bftc-device-1.channels.1.resistance
+  enabled: true
+  interval: 60
+- name: channel2T
+  fileName: CH2 T
+  columns:
+  - time
+  - float bftc-device-1.channels.2.temperature
+  enabled: true
+  interval: 60
+- name: channel2R
+  fileName: CH2 R
+  columns:
+  - time
+  - float bftc-device-1.channels.2.resistance
+  enabled: true
+  interval: 60
+- name: channel3T
+  fileName: CH3 T
+  columns:
+  - time
+  - float bftc-device-1.channels.3.temperature
+  enabled: true
+  interval: 60
+- name: channel3R
+  fileName: CH3 R
+  columns:
+  - time
+  - float bftc-device-1.channels.3.resistance
+  enabled: true
+  interval: 60
+- name: channel4T
+  fileName: CH4 T
+  columns:
+  - time
+  - float bftc-device-1.channels.4.temperature
+  enabled: true
+  interval: 60
+- name: channel4R
+  fileName: CH4 R
+  columns:
+  - time
+  - float bftc-device-1.channels.4.resistance
+  enabled: true
+  interval: 60
+- name: channel5T
+  fileName: CH5 T
+  columns:
+  - time
+  - float bftc-device-1.channels.5.temperature
+  enabled: true
+  interval: 60
+- name: channel5R
+  fileName: CH5 R
+  columns:
+  - time
+  - float bftc-device-1.channels.5.resistance
+  enabled: true
+  interval: 60
+- name: channel6T
+  fileName: CH6 T
+  columns:
+  - time
+  - float bftc-device-1.channels.6.temperature
+  enabled: true
+  interval: 60
+- name: channel6R
+  fileName: CH6 R
+  columns:
+  - time
+  - float bftc-device-1.channels.6.resistance
+  enabled: true
+  interval: 60
+- name: channel7T
+  fileName: CH7 T
+  columns:
+  - time
+  - float bftc-device-1.channels.7.temperature
+  enabled: true
+  interval: 60
+- name: channel7R
+  fileName: CH7 R
+  columns:
+  - time
+  - float bftc-device-1.channels.7.resistance
+  enabled: true
+  interval: 60
+- name: channel8T
+  fileName: CH8 T
+  columns:
+  - time
+  - float bftc-device-1.channels.8.temperature
+  enabled: true
+  interval: 60
+- name: channel8R
+  fileName: CH8 R
+  columns:
+  - time
+  - float bftc-device-1.channels.8.resistance
+  enabled: true
+  interval: 60
+- name: channel9T
+  fileName: CH9 T
+  columns:
+  - time
+  - float bftc-device-2.channels.1.temperature
+  enabled: true
+  interval: 60
+- name: channel9R
+  fileName: CH9 R
+  columns:
+  - time
+  - float bftc-device-2.channels.1.resistance
+  enabled: true
+  interval: 60
+- name: channel10T
+  fileName: CH10 T
+  columns:
+  - time
+  - float bftc-device-2.channels.2.temperature
+  enabled: true
+  interval: 60
+- name: channel10R
+  fileName: CH10 R
+  columns:
+  - time
+  - float bftc-device-2.channels.2.resistance
+  enabled: true
+  interval: 60
+- name: channel11T
+  fileName: CH11 T
+  columns:
+  - time
+  - float bftc-device-2.channels.3.temperature
+  enabled: true
+  interval: 60
+- name: channel11R
+  fileName: CH11 R
+  columns:
+  - time
+  - float bftc-device-2.channels.3.resistance
+  enabled: true
+  interval: 60
+- name: channel12T
+  fileName: CH12 T
+  columns:
+  - time
+  - float bftc-device-2.channels.4.temperature
+  enabled: true
+  interval: 60
+- name: channel12R
+  fileName: CH12 R
+  columns:
+  - time
+  - float bftc-device-2.channels.4.resistance
+  enabled: true
+  interval: 60
+- name: channel13T
+  fileName: CH13 T
+  columns:
+  - time
+  - float bftc-device-2.channels.5.temperature
+  enabled: true
+  interval: 60
+- name: channel13R
+  fileName: CH13 R
+  columns:
+  - time
+  - float bftc-device-2.channels.5.resistance
+  enabled: true
+  interval: 60
+- name: channel14T
+  fileName: CH14 T
+  columns:
+  - time
+  - float bftc-device-2.channels.6.temperature
+  enabled: true
+  interval: 60
+- name: channel14R
+  fileName: CH14 R
+  columns:
+  - time
+  - float bftc-device-2.channels.6.resistance
+  enabled: true
+  interval: 60
+- name: channel15T
+  fileName: CH15 T
+  columns:
+  - time
+  - float bftc-device-2.channels.7.temperature
+  enabled: true
+  interval: 60
+- name: channel15R
+  fileName: CH15 R
+  columns:
+  - time
+  - float bftc-device-2.channels.7.resistance
+  enabled: true
+  interval: 60
+- name: channel16T
+  fileName: CH16 T
+  columns:
+  - time
+  - float bftc-device-2.channels.8.temperature
+  enabled: true
+  interval: 60
+- name: channel16R
+  fileName: CH16 R
+  columns:
+  - time
+  - float bftc-device-2.channels.8.resistance
+  enabled: true
+  interval: 60
+- name: Channels_logger
+  fileName: Channels
+  columns:
+  - time
+  - RAW 0
+  - RAW V001
+  - plc.ValveGroup.V001.bValveOpen
+  - RAW V003
+  - plc.ValveGroup.V003.bValveOpen
+  - RAW V004
+  - plc.ValveGroup.V004.bValveOpen
+  - RAW V005
+  - plc.ValveGroup.V005.bValveOpen
+  - RAW V101
+  - plc.ValveGroup.V101.bValveOpen
+  - RAW V102
+  - plc.ValveGroup.V102.bValveOpen
+  - RAW V104
+  - plc.ValveGroup.V104.bValveOpen
+  - RAW V105
+  - plc.ValveGroup.V105.bValveOpen
+  - RAW V106
+  - plc.ValveGroup.V106.bValveOpen
+  - RAW V107
+  - plc.ValveGroup.V107.bValveOpen
+  - RAW V108
+  - plc.ValveGroup.V108.bValveOpen
+  - RAW V109
+  - plc.ValveGroup.V109.bValveOpen
+  - RAW V110
+  - plc.ValveGroup.V110.bValveOpen
+  - RAW V111
+  - plc.ValveGroup.V111.bValveOpen
+  - RAW V112
+  - plc.ValveGroup.V112.bValveOpen
+  - RAW V113
+  - plc.ValveGroup.V113.bValveOpen
+  - RAW V114
+  - plc.ValveGroup.V114.bValveOpen
+  - RAW V201g
+  - plc.ValveGroup.V201g.bValveOpen
+  - RAW V202
+  - plc.ValveGroup.V202.bValveOpen
+  - RAW V203
+  - plc.ValveGroup.V203.bValveOpen
+  - RAW V204no
+  - plc.ValveGroup.V204no.bValveOpen
+  - RAW V205no
+  - plc.ValveGroup.V205no.bValveOpen
+  - RAW V206no
+  - plc.ValveGroup.V206no.bValveOpen
+  - RAW V301
+  - plc.ValveGroup.V301.bValveOpen
+  - RAW V302
+  - plc.ValveGroup.V302.bValveOpen
+  - RAW V303
+  - plc.ValveGroup.V303.bValveOpen
+  - RAW V304
+  - plc.ValveGroup.V304.bValveOpen
+  - RAW V305
+  - plc.ValveGroup.V305.bValveOpen
+  - RAW V306
+  - plc.ValveGroup.V306.bValveOpen
+  - RAW V401
+  - plc.ValveGroup.V401.bValveOpen
+  - RAW V402
+  - plc.ValveGroup.V402.bValveOpen
+  - RAW V403
+  - plc.ValveGroup.V403.bValveOpen
+  - RAW V404
+  - plc.ValveGroup.V404.bValveOpen
+  - RAW V405
+  - plc.ValveGroup.V405.bValveOpen
+  - RAW V406
+  - plc.ValveGroup.V406.bValveOpen
+  - RAW V407
+  - plc.ValveGroup.V407.bValveOpen
+  - RAW V501h
+  - plc.ValveGroup.V501h.bValveOpen
+  - RAW V502h
+  - plc.ValveGroup.V502h.bValveOpen
+  - RAW V503h
+  - plc.ValveGroup.V503h.bValveOpen
+  - RAW V504h
+  - plc.ValveGroup.V504h.bValveOpen
+  - RAW V505h
+  - plc.ValveGroup.V505h.bValveOpen
+  - RAW V601g
+  - plc.ValveGroup.V601g.bValveOpen
+  - RAW V602
+  - plc.ValveGroup.V602.bValveOpen
+  - RAW Pulsetube1
+  - plc.Pulsetube1.bCompressorRunning
+  - RAW Pulsetube2
+  - plc.Pulsetube2.bCompressorRunning
+  - RAW 4KHeaterRelay_1
+  - plc.Heater4KRelay.b4KHeater1RelayOnOff
+  - RAW 4KHeaterRelay_2
+  - plc.Heater4KRelay.b4KHeater2RelayOnOff
+  - RAW 4KHeaterRelay_3
+  - plc.Heater4KRelay.b4KHeater3RelayOnOff
+  - RAW 4KHeaterRelay_4
+  - plc.Heater4KRelay.b4KHeater4RelayOnOff
+  - RAW COM
+  - COM_ENABLED
+  - RAW B1a
+  - B1A_ENABLED
+  - RAW B1b
+  - B1B_ENABLED
+  - RAW B1c
+  - B1C_ENABLED
+  - RAW B2
+  - B2_ENABLED
+  - RAW R1a
+  - R1A_ENABLED
+  - RAW R1b
+  - R1B_ENABLED
+  - RAW R2
+  - R2_ENABLED
+  interval: 0
+  enabled: true
+- name: Flowmeter_logger
+  fileName: Flowmeter
+  columns:
+  - time
+  - float FLOW_VALUE
+  interval: 60
+  enabled: true
+- name: Heaters_logger
+  fileName: Heaters
+  columns:
+  - time
+  - MXC_HEATER_ENABLED
+  - float MXC_HEATING_POWER
+  - STILL_HEATER_ENABLED
+  - float STILL_HEATING_POWER
+  interval: 60
+  enabled: true
+- name: Pressure_logger
+  fileName: maxigauge
+  columns:
+  - time
+  - RAW CH0
+  - RAW P1
+  - P1_ENABLED
+  - float P1_PRESSURE
+  - RAW 0
+  - RAW 1
+  - RAW CH0
+  - RAW P2
+  - RAW 1
+  - float P2_PRESSURE
+  - RAW 0
+  - RAW 1
+  - RAW CH0
+  - RAW P3
+  - RAW 1
+  - float P3_PRESSURE
+  - RAW 0
+  - RAW 1
+  - RAW CH0
+  - RAW P4
+  - RAW 1
+  - float P4_PRESSURE
+  - RAW 0
+  - RAW 1
+  - RAW CH0
+  - RAW P5
+  - RAW 1
+  - float P5_PRESSURE
+  - RAW 0
+  - RAW 1
+  - RAW CH0
+  - RAW P6
+  - RAW 1
+  - float P6_PRESSURE
+  - RAW 0
+  - RAW 1
+  interval: 60
+  enabled: true
+- name: Pressure_logger_2
+  fileName: maxigauge_2
+  columns:
+  - time
+  - RAW CH0
+  - RAW P7
+  - RAW 1
+  - float P7_PRESSURE
+  - RAW 0
+  - RAW 1
+  - RAW CH0
+  - RAW P8
+  - RAW 1
+  - float P8_PRESSURE
+  - RAW 0
+  - RAW 1
+  - RAW CH0
+  - RAW Dummy9
+  - RAW 1
+  - RAW 0.000000E+00
+  - RAW 0
+  - RAW 1
+  - RAW CH0
+  - RAW Dummy10
+  - RAW 1
+  - RAW 0.000000E+00
+  - RAW 0
+  - RAW 1
+  - RAW CH0
+  - RAW Dummy11
+  - RAW 1
+  - RAW 0.000000E+00
+  - RAW 0
+  - RAW 1
+  - RAW CH0
+  - RAW Dummy12
+  - RAW 1
+  - RAW 0.000000E+00
+  - RAW 0
+  - RAW 1
+  interval: 60
+  enabled: true
+- name: Status_logger
+  fileName: Status
+  columns:
+  - time
+  - RAW diag_ghs_ambient_temperature
+  - float plc.GHSDiagnostics.fGHSAmbientTemperature
+  - RAW diag_ghs_inside_temperature
+  - float plc.GHSDiagnostics.fGHSInsideTemperature
+  - RAW diag_system_voltage
+  - float plc.GHSDiagnostics.sSystemVoltage
+  - RAW diag_cooling_water_flow_rate
+  - float plc.GHSDiagnostics.fCoolingWaterFlowRate
+  - RAW diag_cooling_water_temperature
+  - float plc.GHSDiagnostics.fCoolingWaterTemperature
+  - RAW diag_idp3_current
+  - float plc.GHSDiagnostics.fIDP3Current
+  - RAW diag_idp3_power
+  - float plc.GHSDiagnostics.fIDP3Power
+  - RAW diag_idp3_voltage
+  - float plc.GHSDiagnostics.fIDP3Voltage
+  - RAW diag_idp7_current
+  - float plc.GHSDiagnostics.fIDP7Current
+  - RAW diag_idp7_power
+  - float plc.GHSDiagnostics.fIDP7Power
+  - RAW diag_idp7_voltage
+  - float plc.GHSDiagnostics.fIDP7Voltage
+  - RAW diag_r1a_current
+  - float plc.GHSDiagnostics.fR1aCurrent
+  - RAW diag_r1a_power
+  - float plc.GHSDiagnostics.fR1aPower
+  - RAW diag_r1a_voltage
+  - float plc.GHSDiagnostics.fR1aVoltage
+  - RAW diag_input_air_pressure
+  - float plc.GHSDiagnostics.fInputAirPressure
+  - RAW diag_regulator_air_pressure
+  - float plc.GHSDiagnostics.fRegulatorAirPressure
+  - RAW kashiyama1_driver_temperature
+  - float plc.CirculationRoughPump1.fDriverTemperature
+  - RAW kashiyama1_motor_temperature
+  - float plc.CirculationRoughPump1.fMotorTemperature
+  - RAW kashiyama1_output_current
+  - float plc.CirculationRoughPump1.fOutputCurrent
+  - RAW kashiyama1_output_power
+  - float plc.CirculationRoughPump1.fOutputPower
+  - RAW kashiyama1_output_frequency
+  - float plc.CirculationRoughPump1.fOutputFrequency
+  - RAW kashiyama1_alarm_active
+  - float plc.CirculationRoughPump1.bAlarmStatus
+  - RAW kashiyama1_run_status_alarm
+  - float plc.CirculationRoughPump1.bRunStatus_Alarm
+  - RAW kashiyama2_driver_temperature
+  - float plc.CirculationRoughPump2.fDriverTemperature
+  - RAW kashiyama2_motor_temperature
+  - float plc.CirculationRoughPump2.fMotorTemperature
+  - RAW kashiyama2_output_current
+  - float plc.CirculationRoughPump2.fOutputCurrent
+  - RAW kashiyama2_output_power
+  - float plc.CirculationRoughPump2.fOutputPower
+  - RAW kashiyama2_output_frequency
+  - float plc.CirculationRoughPump2.fOutputFrequency
+  - RAW kashiyama2_alarm_active
+  - float plc.CirculationRoughPump2.bAlarmStatus
+  - RAW kashiyama2_run_status_alarm
+  - float plc.CirculationRoughPump2.bRunStatus_Alarm
+  - RAW mpt200_high_vacuum_cathode_inactive
+  - float plc.IO.P1.bHighVacuumCathodeInactive
+  - RAW pt1_panel_serial_number
+  - float plc.Pulsetube1.nPanelSerialNumber
+  - RAW pt1_operating_state
+  - float plc.Pulsetube1.eOperatingState
+  - RAW pt1_compressor_running
+  - float plc.Pulsetube1.bCompressorRunning
+  - RAW pt1_coolant_in_temperature
+  - float plc.Pulsetube1.fCoolantInTemp
+  - RAW pt1_coolant_out_temperature
+  - float plc.Pulsetube1.fCoolantOutTemp
+  - RAW pt1_oil_temperature
+  - float plc.Pulsetube1.fOilTemp
+  - RAW pt1_helium_temperature
+  - float plc.Pulsetube1.fHeliumTemp
+  - RAW pt1_low_pressure
+  - float plc.Pulsetube1.fLowPressure
+  - RAW pt1_low_pressure_average
+  - float plc.Pulsetube1.fLowPressureAverage
+  - RAW pt1_high_pressure
+  - float plc.Pulsetube1.fHighPressure
+  - RAW pt1_high_pressure_average
+  - float plc.Pulsetube1.fHighPressureAverage
+  - RAW pt1_delta_pressure_average
+  - float plc.Pulsetube1.fDeltaPressureAverage
+  - RAW pt1_motor_current
+  - float plc.Pulsetube1.fMotorCurrent
+  - RAW pt1_hours_of_operation
+  - float plc.Pulsetube1.fHoursOfOperation
+  - RAW pt1_pressure_scale
+  - float plc.Pulsetube1.nPressureScale
+  - RAW pt1_temperature_scale
+  - float plc.Pulsetube1.nTempScale
+  - RAW pt2_panel_serial_number
+  - float plc.Pulsetube2.nPanelSerialNumber
+  - RAW pt2_operating_state
+  - float plc.Pulsetube2.eOperatingState
+  - RAW pt2_compressor_running
+  - float plc.Pulsetube2.bCompressorRunning
+  - RAW pt2_coolant_in_temperature
+  - float plc.Pulsetube2.fCoolantInTemp
+  - RAW pt2_coolant_out_temperature
+  - float plc.Pulsetube2.fCoolantOutTemp
+  - RAW pt2_oil_temperature
+  - float plc.Pulsetube2.fOilTemp
+  - RAW pt2_helium_temperature
+  - float plc.Pulsetube2.fHeliumTemp
+  - RAW pt2_low_pressure
+  - float plc.Pulsetube2.fLowPressure
+  - RAW pt2_low_pressure_average
+  - float plc.Pulsetube2.fLowPressureAverage
+  - RAW pt2_high_pressure
+  - float plc.Pulsetube2.fHighPressure
+  - RAW pt2_high_pressure_average
+  - float plc.Pulsetube2.fHighPressureAverage
+  - RAW pt2_delta_pressure_average
+  - float plc.Pulsetube2.fDeltaPressureAverage
+  - RAW pt2_motor_current
+  - float plc.Pulsetube2.fMotorCurrent
+  - RAW pt2_hours_of_operation
+  - float plc.Pulsetube2.fHoursOfOperation
+  - RAW pt2_pressure_scale
+  - float plc.Pulsetube2.nPressureScale
+  - RAW pt2_temperature_scale
+  - float plc.Pulsetube2.nTempScale
+  - RAW pt3_panel_serial_number
+  - float plc.Pulsetube3.nPanelSerialNumber
+  - RAW pt3_operating_state
+  - float plc.Pulsetube3.eOperatingState
+  - RAW pt3_compressor_running
+  - float plc.Pulsetube3.bCompressorRunning
+  - RAW pt3_coolant_in_temperature
+  - float plc.Pulsetube3.fCoolantInTemp
+  - RAW pt3_coolant_out_temperature
+  - float plc.Pulsetube3.fCoolantOutTemp
+  - RAW pt3_oil_temperature
+  - float plc.Pulsetube3.fOilTemp
+  - RAW pt3_helium_temperature
+  - float plc.Pulsetube3.fHeliumTemp
+  - RAW pt3_low_pressure
+  - float plc.Pulsetube3.fLowPressure
+  - RAW pt3_low_pressure_average
+  - float plc.Pulsetube3.fLowPressureAverage
+  - RAW pt3_high_pressure
+  - float plc.Pulsetube3.fHighPressure
+  - RAW pt3_high_pressure_average
+  - float plc.Pulsetube3.fHighPressureAverage
+  - RAW pt3_delta_pressure_average
+  - float plc.Pulsetube3.fDeltaPressureAverage
+  - RAW pt3_motor_current
+  - float plc.Pulsetube3.fMotorCurrent
+  - RAW pt3_hours_of_operation
+  - float plc.Pulsetube3.fHoursOfOperation
+  - RAW pt3_pressure_scale
+  - float plc.Pulsetube3.nPressureScale
+  - RAW pt3_temperature_scale
+  - float plc.Pulsetube3.nTempScale
+  - RAW tc400_1_process_gas
+  - float plc.IO.B1a.nProcessGas
+  - RAW tc400_1_speed_status
+  - float plc.IO.B1a.nSpeedStatus
+  - RAW tc400_1_actual_speed
+  - float plc.IO.B1a.nActualSpeed
+  - RAW tc400_1_power
+  - float plc.IO.B1a.nPower
+  - RAW tc400_1_motor_temperature
+  - float plc.IO.B1a.nMotTemperature
+  - RAW tc400_1_bearing_temperature
+  - float plc.IO.B1a.nBrgTemperature
+  - RAW tc400_1_error
+  - float plc.IO.B1a.bErrorOn
+  - RAW tc400_1_warning
+  - float plc.IO.B1a.bWarningOn
+  - RAW tc400_2_process_gas
+  - float plc.IO.B1b.nProcessGas
+  - RAW tc400_2_speed_status
+  - float plc.IO.B1b.nSpeedStatus
+  - RAW tc400_2_actual_speed
+  - float plc.IO.B1b.nActualSpeed
+  - RAW tc400_2_power
+  - float plc.IO.B1b.nPower
+  - RAW tc400_2_motor_temperature
+  - float plc.IO.B1b.nMotTemperature
+  - RAW tc400_2_bearing_temperature
+  - float plc.IO.B1b.nBrgTemperature
+  - RAW tc400_2_error
+  - float plc.IO.B1b.bErrorOn
+  - RAW tc400_2_warning
+  - float plc.IO.B1b.bWarningOn
+  - RAW tc400_3_process_gas
+  - float plc.IO.B1c.nProcessGas
+  - RAW tc400_3_speed_status
+  - float plc.IO.B1c.nSpeedStatus
+  - RAW tc400_3_actual_speed
+  - float plc.IO.B1c.nActualSpeed
+  - RAW tc400_3_power
+  - float plc.IO.B1c.nPower
+  - RAW tc400_3_motor_temperature
+  - float plc.IO.B1c.nMotTemperature
+  - RAW tc400_3_bearing_temperature
+  - float plc.IO.B1c.nBrgTemperature
+  - RAW tc400_3_error
+  - float plc.IO.B1c.bErrorOn
+  - RAW tc400_3_warning
+  - float plc.IO.B1c.bWarningOn
+  - RAW tc80_process_gas
+  - float plc.IO.B2.nProcessConfiguration
+  - RAW tc80_actual_speed
+  - float plc.IO.B2.nTurboSpeed
+  - RAW tc80_power
+  - float plc.IO.B2.nTurboPower
+  - RAW tc80_pump_temperature
+  - float plc.IO.B2.nTurboPumpTemperature
+  - RAW tc80_error
+  - float plc.IO.B2.bAlarm
+  - RAW tc80_warning
+  - float plc.IO.B2.bWarning
+  interval: 60
+  enabled: true

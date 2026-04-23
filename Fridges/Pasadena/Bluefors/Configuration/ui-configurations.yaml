@@ -1,0 +1,313 @@
+version: 3.4.2
+diagrams-conditional-elements:
+  system-diagram:
+    fse--group:
+      hide: true
+    air--group:
+      hide: true
+    turbo-1:
+      position:
+        "y": 10
+    turbo-2:
+      position:
+        "y": 15
+    turbo-3:
+      hide: true
+    r1--to--b1c--curve:
+      hide: true
+    r1--curve--left:
+      hide: true
+    r1--connector-top--sm:
+      hide: true
+    b1c--group:
+      hide: true
+    b1c--or--r1-lines--line:
+      hide: true
+    r1--lines:
+      hide: true
+    b1c--no-r1--line:
+      hide: true
+    b1c--and--r1-lines--circle:
+      hide: true
+    double-cond-lines:
+      hide: true
+    Pump-Expandable-expand:
+      hide: true
+    turbo-expand:
+      position:
+        x: -6
+    booster-b2--group:
+      hide: true
+  system-b1:
+    fse--group:
+      hide: true
+    turbo-3:
+      hide: true
+    V204no:
+      hide: true
+    V205no:
+      hide: true
+    b1c--or--r1-lines--line:
+      hide: true
+  system-r1:
+    r1a-bypass--group:
+      hide: true
+    r1b-bypass--group:
+      hide: true
+    r1--full:
+      hide: true
+system-info-box:
+  name: System info box
+  groups:
+  - title: Controls
+    elements:
+    - title: Pulse tube
+      clickable:
+        deviceId: PULSE_TUBE
+        command: pulseTubeStartStop
+        mapping: PULSE_TUBE_ENABLED
+    - title: Turbo pump
+      clickable:
+        deviceId: TURBO_PUMP
+        command: turboPumpsStartStop
+        mapping: TURBO_PUMP_ENABLED
+  - title: Heaters
+    elements:
+    - title: 4K heater 1
+      clickable:
+        deviceId: 4K_HEATER_1_ENABLED
+        command: heaterOnOff
+        mapping: 4K_HEATER_1_ENABLED
+    - title: 4K heater 2
+      clickable:
+        deviceId: 4K_HEATER_2_ENABLED
+        command: heaterOnOff
+        mapping: 4K_HEATER_2_ENABLED
+    - title: 4K heater 3
+      clickable:
+        deviceId: 4K_HEATER_3_ENABLED
+        command: heaterOnOff
+        mapping: 4K_HEATER_3_ENABLED
+    - title: 4K heater 4
+      clickable:
+        deviceId: 4K_HEATER_4_ENABLED
+        command: heaterOnOff
+        mapping: 4K_HEATER_4_ENABLED
+    - title: Still heat switch
+      clickable:
+        deviceId: HEATSWITCH_STILL
+        command: heaterOnOff
+        mapping: HEATSWITCH_STILL_ENABLED
+    - title: MXC heat switch
+      clickable:
+        deviceId: HEATSWITCH_MXC
+        command: heaterOnOff
+        mapping: HEATSWITCH_MXC_ENABLED
+    - title: Still heater
+      value:
+        mapping: STILL_HEATING_POWER
+        unit: W
+      clickable:
+        deviceId: STILL_HEATER
+        command: heaterOnOff
+        mapping: STILL_HEATER_ENABLED
+    - title: MXC heater
+      value:
+        mapping: MXC_HEATING_POWER
+        unit: W
+      clickable:
+        deviceId: MXC_HEATER
+        command: heaterOnOff
+        mapping: MXC_HEATER_ENABLED
+  - title: Temperatures
+    elements:
+    - title: 50K flange
+      value:
+        mapping: 50K_TEMPERATURE
+        unit: K
+      stateValue:
+        mapping: 50K_TEMPERATURE
+        compute: delta
+    - title: 4K flange
+      value:
+        mapping: 4K_TEMPERATURE
+        unit: K
+      stateValue:
+        mapping: 4K_TEMPERATURE
+        compute: delta
+    - title: Still flange
+      value:
+        mapping: STILL_TEMPERATURE
+        unit: K
+      stateValue:
+        mapping: STILL_TEMPERATURE
+        compute: delta
+    - title: MXC flange
+      value:
+        mapping: MXC_TEMPERATURE
+        unit: K
+      stateValue:
+        mapping: MXC_TEMPERATURE
+        compute: delta
+dashboard-temperature-control:
+  name: Dashboard temperature control
+  groups:
+  - title: Mixing chamber
+    values:
+      UI-TEMPERATURE:
+        title: Temperature
+        mapping: MXC_TEMPERATURE
+        unit: K
+      UI-TEMPERATURE-DELTA:
+        mapping: MXC_TEMPERATURE
+        unit: K
+        compute: delta
+      UI-TARGET-TEMPERATURE:
+        mapping: MXC_TARGET_TEMPERATURE
+        unit: K
+      UI-TARGET-TEMPERATURE-ENABLED:
+        mapping: MXC_TARGET_TEMPERATURE_ENABLED
+        unit: ""
+      UI-HEATING-POWER:
+        mapping: MXC_HEATING_POWER
+        unit: W
+      UI-HEATER-ENABLED:
+        mapping: MXC_HEATER_ENABLED
+        unit: ""
+  - title: Still
+    values:
+      UI-TEMPERATURE:
+        title: Temperature
+        mapping: STILL_TEMPERATURE
+        unit: K
+      UI-TEMPERATURE-DELTA:
+        mapping: STILL_TEMPERATURE
+        unit: K
+        compute: delta
+      UI-TARGET-TEMPERATURE:
+        mapping: STILL_TARGET_TEMPERATURE
+        unit: K
+      UI-TARGET-TEMPERATURE-ENABLED:
+        mapping: STILL_TARGET_TEMPERATURE_ENABLED
+        unit: ""
+      UI-HEATING-POWER:
+        mapping: STILL_HEATING_POWER
+        unit: W
+      UI-HEATER-ENABLED:
+        mapping: STILL_HEATER_ENABLED
+        unit: ""
+dataviewer-default-settings:
+  version: ghs-400---v0.7.5
+  tabs:
+  - name: Tab 1
+    twoColumnLayout: true
+    isGlobalTime: true
+    liveMode: true
+    timeRange:
+      type: relative
+      amount: 15
+      unit: minute
+    graphs:
+    - left:
+        category: Pressure-bar
+        items:
+        - P1_PRESSURE
+        - P2_PRESSURE
+        - P3_PRESSURE
+      right:
+        category: Flow-mol/s
+        items:
+        - FLOW_VALUE
+    - left:
+        category: Temperature-K
+        items:
+        - 50K_TEMPERATURE
+        - 4K_TEMPERATURE
+        - STILL_TEMPERATURE
+        - MXC_TEMPERATURE
+dataviewer-value-categories:
+  name: System value categories
+  units:
+  - quantity: Temperature
+    unit: K
+    mappings:
+    - 50K_TEMPERATURE
+    - 4K_TEMPERATURE
+    - B1_TEMPERATURE
+    - COOLING_WATER_TEMPERATURE
+    - STILL_TEMPERATURE
+    - MXC_TEMPERATURE
+  - quantity: Flow
+    unitPrefixes: m
+    unit: mol/s
+    mappings:
+    - FLOW_VALUE
+  - quantity: Pressure
+    unitPrefixes: m
+    unit: bar
+    mappings:
+    - P1_PRESSURE
+    - P2_PRESSURE
+    - P3_PRESSURE
+    - P4_PRESSURE
+    - P5_PRESSURE
+    - P6_PRESSURE
+    - P7_PRESSURE
+  - quantity: Speed
+    unit: Hz
+    mappings:
+    - B1A_SPEED
+    - B1B_SPEED
+    - B2_SPEED
+  - quantity: Power
+    unit: W
+    mappings:
+    - B1A_POWER
+    - B1B_POWER
+    - MXC_HEATING_POWER
+    - STILL_HEATING_POWER
+    - R1A_PUMP_POWER
+    - R2_PUMP_POWER
+    - COM_PUMP_POWER
+  diagrams:
+  - id: system-diagram
+    name: GHS-400
+  - id: system-b1
+    name: Booster unit
+  - id: system-r1
+    name: Redundant main circulation pump unit
+dataviewer-info-box:
+  name: Info box data
+  groups:
+  - title: Heating power
+    elements:
+    - value:
+        mapping: 4K_HEATING_POWER
+        unit: W
+      title: 4K flange
+    - value:
+        mapping: STILL_HEATING_POWER
+        unit: W
+      title: Still flange
+    - value:
+        mapping: MXC_HEATING_POWER
+        unit: W
+      title: MXC flange
+  - title: Temperatures
+    elements:
+    - value:
+        mapping: 50K_TEMPERATURE
+        unit: K
+      title: 50K flange
+    - value:
+        mapping: 4K_TEMPERATURE
+        unit: K
+      title: 4K flange
+    - value:
+        mapping: STILL_TEMPERATURE
+        unit: K
+      title: Still flange
+    - value:
+        mapping: MXC_TEMPERATURE
+        unit: K
+      title: MXC flange

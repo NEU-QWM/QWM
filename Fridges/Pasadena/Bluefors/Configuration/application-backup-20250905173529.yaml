@@ -1,0 +1,34 @@
+# ------------------------------------------------------------
+# Application configuration file
+# ------------------------------------------------------------
+
+# --- External application settings/properties
+server:
+  port: 8082
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5434/cs2
+    username: postgres
+    password: postgres
+  flyway:
+    url: jdbc:postgresql://localhost:5434/cs2
+    user: postgres
+    password: postgres
+
+# --- Database maintenance settings
+cs2:
+  data:
+    report-interval: 1209600
+    cleanup:
+      schedule: "0 0 2 * * *"
+      max-disk-utilization: 0.7
+      max-age-in-days: -1
+      min-age-in-days: 180
+  user:
+    authentication:
+      enabled: false
+      default:
+        realm: cs2
+        server-url: http://localhost:8083/auth
+  cors:
+    origins: http://localhost:3000

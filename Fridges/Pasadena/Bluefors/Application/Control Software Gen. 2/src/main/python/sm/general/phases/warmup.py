@@ -173,30 +173,34 @@ class StopCoolingCollectMixture(Procedure):
         # Pump cond-side and trap empty
         device.valve_on("V203")
 
-        logger.info("Softening vacuum n times")
-        # Soften vacuum N times
-        for i in range(parameters["softVacuumCycles"]):
-            if not parameters["softVacuumWithN2"]:
-                device.valve_on("V110")
-                self.wait(5)
-                device.valve_off("V110")
-            else:
-                device.valve_on("V111")
-                self.wait(5)
-                device.valve_off("V111")
-            self.wait(5)
-            if state["P6_PRESSURE"] < 1.05: # safety: open to VC only if no P6 overpressure
-                device.valves_on(["V101", "V104"])
-                self.wait(5)
-                device.valves_off(["V101", "V104"])
-                self.wait(2)
-            else:
-                logger.info("Overpressure of P6, abort softening of vacuum")
-                logger.info("Release overpressure with vent port V110")
-                device.valve_on("V110")
-                self.wait(5)
-                device.valve_off("V110")
-                self.wait(2)
+        # logger.info("Softening vacuum n times")
+        # 
+        # Commented the ALL softening procedures out on Apirl 18, 2026 -Seong
+        # 
+        # # Soften vacuum N times
+        # 
+        # for i in range(parameters["softVacuumCycles"]):
+        #     if not parameters["softVacuumWithN2"]:
+        #         device.valve_on("V110")
+        #         self.wait(5)
+        #         device.valve_off("V110")
+        #     else:
+        #         device.valve_on("V111")
+        #         self.wait(5)
+        #         device.valve_off("V111")
+        #     self.wait(5)
+        #     if state["P6_PRESSURE"] < 1.05: # safety: open to VC only if no P6 overpressure
+        #         device.valves_on(["V101", "V104"])
+        #         self.wait(5)
+        #         device.valves_off(["V101", "V104"])
+        #         self.wait(2)
+        #     else:
+        #         logger.info("Overpressure of P6, abort softening of vacuum")
+        #         logger.info("Release overpressure with vent port V110")
+        #         device.valve_on("V110")
+        #         self.wait(5)
+        #         device.valve_off("V110")
+        #         self.wait(2)
 
         # Turn on 4K heaters (fixed power)
         Helpers.warmup_heater_on(parameters)
