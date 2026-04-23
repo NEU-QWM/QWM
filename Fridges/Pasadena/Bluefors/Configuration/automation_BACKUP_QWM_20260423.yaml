@@ -54,7 +54,7 @@ automations:
     type: float
     name: Pulse Tube Cooling Final Temperature
   - id: pulseTubeCoolingTargetPressure
-    value: 1.0E-9
+    value: 3.0E-7
     type: float
     name: Pulse Tube Cooling Target Pressure
   - id: pulseTubeCoolingFinalizationMaxTime

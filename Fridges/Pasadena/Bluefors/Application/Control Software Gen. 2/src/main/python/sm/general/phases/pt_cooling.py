@@ -162,18 +162,42 @@ class InitialCooling(Procedure):
           self.command_queue.execute_queued_commands()
 
 
-
+    #
+    # MODIFIED BY QWM 04/23/2026 8:10 AM
+    #   
+    # --------------------------------------------------------------------------------------------------------------
+    #   sw = self.stopwatch()
+    #   logger.info("Waiting until T50K< 85K, T4K< 50K, Tstill< 55K and P1< pulseTubeCoolingTargetPressure")
+    #   while (
+    #       state["P1_PRESSURE"] > parameters["pulseTubeCoolingTargetPressure"]
+    #       or state["50K_TEMPERATURE"] > 85
+    #       or state["4K_TEMPERATURE"] > 50
+    #       or state["STILL_TEMPERATURE"] > 55
+    #   ):
+    #     self.wait(5)
+    #     if sw.elapsed > parameters["pulseTubeCoolingMaxTime"]:
+    #       raise ProcedureError(1649, "Maximum time exceeded for pre-cooling")
+    #
+    # --------------------------------------------------------------------------------------------------------------
+    # "C:\Bluefors\Configuration\automation.yaml"
+    #
+    #   - id: pulseTubeCoolingTargetPressure
+    # value: 1.0E-9
+    # type: float
+    # name: Pulse Tube Cooling Target Pressure
+    #
+        
       sw = self.stopwatch()
       logger.info("Waiting until T50K< 85K, T4K< 50K, Tstill< 55K and P1< pulseTubeCoolingTargetPressure")
       while (
           state["P1_PRESSURE"] > parameters["pulseTubeCoolingTargetPressure"]
-          or state["50K_TEMPERATURE"] > 85
-          or state["4K_TEMPERATURE"] > 50
-          or state["STILL_TEMPERATURE"] > 55
+          or state["50K_TEMPERATURE"] > 50
+          or state["4K_TEMPERATURE"] > 20
+          or state["STILL_TEMPERATURE"] > 20
       ):
         self.wait(5)
         if sw.elapsed > parameters["pulseTubeCoolingMaxTime"]:
-          raise ProcedureError(1649, "Maximum time exceeded for pre-cooling")
+          raise ProcedureError(1649, "Maximum time exceeded for pre-cooling")  
 
       # StopVacuumPumping
 
