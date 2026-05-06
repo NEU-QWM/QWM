@@ -1,0 +1,5 @@
+*.npz
+*.json
+*.png
+*.mat
+*.fig
