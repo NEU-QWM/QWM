@@ -38,7 +38,7 @@ res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation = single_qubit
 thermalization_time = qubit_relaxation//4 # From ns to clock cycles
 # Dephasing time sweep (in clock cycles = 4ns) - minimum is 4 clock cycles
 tau_min = 4
-tau_max = 10000 // 4
+tau_max = 6_000 // 4
 d_tau = 40 // 4
 taus = np.arange(tau_min, tau_max + 0.1, d_tau)  # + 0.1 to add tau_max to taus
 # Detuning converted into virtual Z-rotations to observe Ramsey oscillation and get the qubit frequency

@@ -40,13 +40,13 @@ print(res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation, x180_am
 thermalization_time = qubit_relaxation//4 # From ns to clock cycles
 
 spec_span = 50 * u.MHz
-spec_df = 100 * u.kHz
+spec_df = 400 * u.kHz
 spec_sweep_dfs = np.arange(-spec_span//2, spec_span//2 + spec_df, spec_df)
 spec_frequency = spec_sweep_dfs + qubit_frequency
 # Pulse duration sweep (in clock cycles = 4ns) - must be larger than 4 clock cycles
-t_min = 10
-t_max = 500
-dt = 10
+t_min = 40    * u.ns // 4
+t_max = 3_000 * u.ns // 4
+dt    = 40    * u.ns // 4
 durations = np.arange(t_min, t_max, dt)
 
 # Data to save

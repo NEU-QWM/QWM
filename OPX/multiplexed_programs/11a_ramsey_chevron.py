@@ -39,11 +39,11 @@ thermalization_time = qubit_relaxation//4 # From ns to clock cycles
 
 # Frequency sweep in Hz
 freq_span = 10 * u.MHz
-df = 100 * u.kHz
+df = 25 * u.kHz
 dfs = np.arange(-freq_span, freq_span, df)
 
 # Idle time sweep (Needs to be a list of integers) - in clock cycles (4ns)
-tau_max = 2000 // 4
+tau_max = 4000 // 4
 d_tau = 40 // 4
 taus = np.arange(0, tau_max, d_tau)
 if len(np.where((taus > 0) & (taus < 4))[0]) > 0:

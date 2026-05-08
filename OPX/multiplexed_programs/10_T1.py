@@ -28,20 +28,20 @@ from configuration.OPX1000config import *
 ##################
 #   Parameters   #
 ##################
-n_avg = 4000  # Number of averaging loops
+n_avg = 40000  # Number of averaging loops
 qubit_key = "q1"
 required_parameters = ["resonator_key", "readout_len", "qubit_frequency", "qubit_IF", "qubit_relaxation", "x180_amp"]
 res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation, x180_amp = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
 
 thermalization_time = qubit_relaxation//4 # From ns to clock cycles
 # The wait time sweep (in clock cycles = 4ns) - must be larger than 4 clock cycles
-tau_min = 16 // 4
-tau_max = 16_000 // 4
-d_tau = 32 // 4
-taus = np.arange(tau_min, tau_max + 0.1, d_tau)  # Linear sweep
-# taus = np.logspace(np.log10(tau_min), np.log10(tau_max), 120, endpoint=True)  # Log sweep
-# taus = np.round(taus)
-# taus = np.unique(taus)
+tau_min = 16 # // 4
+tau_max = 12_000 # // 4
+d_tau = 128 // 4
+# taus = np.arange(tau_min, tau_max + 0.1, d_tau)  # Linear sweep
+taus = np.logspace(np.log10(tau_min), np.log10(tau_max), 200, endpoint=True)  # Log sweep
+taus = np.array(np.unique(taus//4), dtype=int)
+print(taus)
 
 # Data to save
 save_data_dict = {
@@ -66,7 +66,7 @@ with program() as prog:
     n_st = declare_stream()  # Stream for the averaging iteration 'n'
 
     with for_(n, 0, n < n_avg, n + 1):
-        with for_(*from_array(t, taus)):
+        with for_each_(t, taus):
             # Play the x180 gate to put the qubit in the excited state
             play("x180", qubit_key)
             # Wait a varying time after putting the qubit in the excited state
@@ -161,10 +161,10 @@ else:
 
         fit = Fit()
         fig_fit = plt.figure()
-        decay_fit = fit.T1(4 * taus, I, plot=True)
+        decay_fit = fit.T1(4 * taus, Q, plot=True)
         qubit_T1 = np.round(np.abs(decay_fit["T1"][0]) / 4) * 4
         plt.xlabel("Delay [ns]")
-        plt.ylabel("I quadrature [V]")
+        plt.ylabel("Q quadrature [V]")
         print(f"Qubit decay time to update in the config: qubit_T1 = {qubit_T1:.0f} ns")
         plt.legend((f"Relaxation time T1 = {qubit_T1:.0f} ns",))
         plt.title(f"{qubit_key}, T1 measurement")

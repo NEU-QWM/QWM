@@ -115,7 +115,6 @@ with program() as prog:
 #####################################
 #  Open Communication with the QOP  #
 #####################################
-from opx_credentials import qop_ip, cluster
 from qm import CompilerOptionArguments
 qmm = QuantumMachinesManager(host=qop_ip, cluster_name=cluster)
 

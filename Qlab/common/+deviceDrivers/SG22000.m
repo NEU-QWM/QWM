@@ -8,6 +8,7 @@ classdef (Sealed) SG22000 < deviceDrivers.lib.uWSource
         output
         frequency   % Hz
         power       % dBm
+        vernier     % fine power trim (unitless)
         phase       % deg
         mod
         alc
@@ -117,6 +118,22 @@ classdef (Sealed) SG22000 < deviceDrivers.lib.uWSource
             obj.assertConnected();
             assert(isnumeric(value), 'Power must be numeric (dBm)');
             obj.write(sprintf('POWER %f', value));
+        end
+    end
+
+    % =========================================================
+    % VERNIER (Fine Power Trim)
+    % =========================================================
+    methods
+        function val = get.vernier(obj)
+            raw = obj.query('VERNIER?');
+            val = obj.parseNum(raw);
+        end
+
+        function obj = set.vernier(obj, value)
+            obj.assertConnected();
+            assert(isnumeric(value), 'Vernier must be numeric');
+            obj.write(sprintf('VERNIER %f', value));
         end
     end
 

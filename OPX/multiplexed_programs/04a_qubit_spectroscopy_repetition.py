@@ -1,22 +1,27 @@
 """
-        RESONATOR SPECTROSCOPY VERSUS READOUT AMPLITUDE
-This sequence involves measuring the resonator by sending a readout pulse and demodulating the signals to
-extract the 'I' and 'Q' quadratures.
-This is done across various readout intermediate dfs and amplitudes.
-Based on the results, one can determine if a qubit is coupled to the resonator by noting the resonator frequency
-splitting. This information can then be used to adjust the readout amplitude, choosing a readout amplitude value
-just before the observed frequency splitting.
+        QUBIT SPECTROSCOPY
+This sequence involves sending a saturation pulse to the qubit, placing it in a mixed state,
+and then measuring the state of the resonator across various qubit drive intermediate dfs.
+In order to facilitate the qubit search, the qubit pulse duration and amplitude can be changed manually in the QUA
+program directly without having to modify the configuration.
+
+The data is post-processed to determine the qubit resonance frequency, which can then be used to adjust
+the qubit intermediate frequency in the configuration under "qubit_IF".
+
+Note that it can happen that the qubit is excited by the image sideband or LO leakage instead of the desired sideband.
+This is why calibrating the qubit mixer is highly recommended.
+
+This step can be repeated using the "x180" operation instead of "saturation" to adjust the pulse parameters (amplitude,
+duration, frequency) before performing the next calibration steps.
 
 Prerequisites:
-    - Calibration of the time of flight, offsets, and gains (referenced as "time_of_flight").
-    - Calibration of the IQ mixer connected to the readout line (be it an external mixer or an Octave port).
-    - Identification of the resonator's resonance frequency (referred to as "resonator_spectroscopy").
-    - Configuration of the readout pulse amplitude (the pulse processor will sweep up to twice this value) and duration.
-    - Specification of the expected resonator depletion time in the configuration.
+    - Identification of the resonator's resonance frequency when coupled to the qubit in question (referred to as "resonator_spectroscopy").
+    - Calibration of the IQ mixer connected to the qubit drive line (whether it's an external mixer or an Octave port).
+    - Configuration of the saturation pulse amplitude and duration to transition the qubit into a mixed state.
+    - Specification of the expected qubit T1 in the configuration.
 
 Before proceeding to the next node:
-    - Update the readout frequency, labeled as "resonator_IF", in the configuration.
-    - Adjust the readout amplitude, labeled as "readout_amp", in the configuration.
+    - Update the qubit frequency, labeled as "qubit_IF", in the configuration.
 """
 
 from qm.qua import *
@@ -37,32 +42,30 @@ from configuration.OPX1000config import *
 #   Parameters   #
 ##################
 # Parameters Definition
-n_avg = 5000  # Number of averaging loops
+n_avg = 1000  # Number of averaging loops
+n_rep = 10   # Number of repetition loops
+repetitions = np.arange(1,n_rep+1)
+
+res_key = "r1"
 qubit_key = "q1"
-required_parameters = ["resonator_key", "resonator_relaxation", "resonator_frequency", "resonator_IF", "readout_len", "readout_amp"]
-res_key, res_relaxation, res_frequency, res_IF, readout_len, readout_amp = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
+required_parameters = ["resonator_key", "readout_len", "qubit_frequency", "qubit_IF", "qubit_relaxation"]
+res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
 
-depletion_time = res_relaxation//4 # From ns to clock cycles
+# thermalization_time = qubit_relaxation//4 # From ns to clock cycles
+thermalization_time = 4.0 * u.us //4 # From ns to clock cycles
 
-res_frequency = res_frequency
-res_spec_span = 5 * u.MHz
-res_spec_df = 80 * u.kHz
-res_spec_sweep_dfs = np.arange(-res_spec_span//2, res_spec_span//2 + res_spec_df, res_spec_df)
-res_spec_frequency = res_spec_sweep_dfs + res_frequency
+print(f"Qubit frequency is {qubit_IF}")
 
-# Pulse amplitude sweep (as a pre-factor of the qubit pulse amplitude) - must be within [-2; 2)
-a_min = 0.02
-a_max = 1.96
-d_a = 0.02
-# amplitudes = np.arange(a_min, a_max+d_a, d_a)
-amplitudes = np.logspace(-3, 0, 100, endpoint=True)
+spec_span = 50 * u.MHz
+spec_df = 200 * u.kHz
+spec_sweep_dfs = np.arange(-spec_span//2, spec_span//2 + spec_df, spec_df)
+spec_frequency = spec_sweep_dfs + qubit_frequency
 
-# Data to save
+# ---- Data to save ---- #
 save_data_dict = {
     "qubit_key": qubit_key,
     "n_avg": n_avg,
-    "amplitude": amplitudes,
-    "frequency": res_spec_frequency,
+    "frequency": spec_frequency,
     "config": config,
 }
 save_dir = Path(__file__).resolve().parent / "data"
@@ -71,43 +74,57 @@ save_dir = Path(__file__).resolve().parent / "data"
 # The QUA program #
 ###################
 with program() as prog:
-    reset_global_phase()
-    n = declare(int)  # QUA variable for the averaging loop
-    df = declare(int)  # QUA variable for the readout frequency
-    a = declare(fixed)  # QUA variable for the readout amplitude pre-factor
-    I = declare(fixed)  # QUA variable for the measured 'I' quadrature
-    Q = declare(fixed)  # QUA variable for the measured 'Q' quadrature
-    I_st = declare_stream()  # Stream for the 'I' quadrature
-    Q_st = declare_stream()  # Stream for the 'Q' quadrature
-    n_st = declare_stream()  # Stream for the averaging iteration 'n'
+    I_rep = np.array([]) # Stream for arrays of 'I' quadrature
+    Q_rep = np.array([])  # Stream for arrays of 'Q' quadrature
+    
+    for r in range(n_rep):
+        reset_global_phase()
+        n = declare(int)  # QUA variable for the averaging loop
+        df = declare(int)  # QUA variable for the qubit frequency
+        I = declare(fixed)  # QUA variable for the measured 'I' quadrature
+        Q = declare(fixed)  # QUA variable for the measured 'Q' quadrature
+        I_st = declare_stream()  # Stream for the 'I' quadrature
+        Q_st = declare_stream()  # Stream for the 'Q' quadrature
+        n_st = declare_stream()  # Stream for the averaging iteration 'n'
 
-    with for_(n, 0, n < n_avg, n + 1):  # QUA for_ loop for averaging
-        with for_(*from_array(df, res_spec_sweep_dfs)):  # QUA for_ loop for sweeping the frequency
-            # Update the frequency of the digital oscillator linked to the resonator element
-            update_frequency(res_key, df + res_IF)
-            with for_each_(a, amplitudes):
-                # Measure the resonator (send a readout pulse whose amplitude is rescaled by the pre-factor 'a' [-2, 2)
-                # and demodulate the signals to get the 'I' & 'Q' quadratures)
+        with for_(n, 0, n < n_avg, n + 1):
+            with for_(*from_array(df, spec_sweep_dfs)):
+                # Update the frequency of the digital oscillator linked to the qubit element
+                update_frequency(qubit_key, df + qubit_IF)
+                # Play the saturation pulse to put the qubit in a mixed state - Can adjust the amplitude on the fly [-2; 2)
+                play("saturation", qubit_key)
+                # Align the two elements to measure after playing the qubit pulse.
+                # One can also measure the resonator while driving the qubit by commenting the 'align'
+                align(qubit_key, res_key)
+                # Measure the state of the resonator
                 measure(
-                    "readout" * amp(a),
+                    "readout",
                     res_key,
                     dual_demod.full("cos", "sin", I),
                     dual_demod.full("minus_sin", "cos", Q),
                 )
-                # Wait for the resonator to deplete
-                wait(depletion_time, res_key)
+                # Wait for the qubit to decay to the ground state
+                wait(thermalization_time, res_key)
                 # Save the 'I' & 'Q' quadratures to their respective streams
                 save(I, I_st)
                 save(Q, Q_st)
-        # Save the averaging iteration to get the progress bar
-        save(n, n_st)
+            # Save the averaging iteration to get the progress bar
+            save(n, n_st)
 
-    with stream_processing():
-        # Cast the data into a 2D matrix, average the 2D matrices together and store the results on the OPX processor
-        # Note that the buffering goes from the most inner loop (left) to the most outer one (right)
-        I_st.buffer(len(amplitudes)).buffer(len(res_spec_sweep_dfs)).average().save("I")
-        Q_st.buffer(len(amplitudes)).buffer(len(res_spec_sweep_dfs)).average().save("Q")
-        n_st.save("iteration")
+
+        # n_st.save("iteration")
+        I_st.buffer(len(spec_sweep_dfs)).average()
+        Q_st.buffer(len(spec_sweep_dfs)).average()
+        
+        # Save 'I' and 'Q' for each repetition
+        I_rep = np.append(I_rep, I_st)
+        Q_rep = np.append(Q_rep, Q_st)
+
+        del n,df,I,Q,I_st,Q_st,n_st
+
+        
+        
+        
 
 #####################################
 #  Open Communication with the QOP  #
@@ -135,7 +152,7 @@ else:
     qm = qmm.open_qm(config, close_other_machines=True)
     # Send the QUA program to the OPX, which compiles and executes it
     job = qm.execute(prog)
-    # Get results from QUA program
+    # Creates a result handle to fetch data from the OPX
     res_handles = fetching_tool(job, data_list = ["iteration", "I", "Q"], mode = "live")
     # Waits (blocks the Python console) until all results have been acquired
     IQ = False
@@ -154,16 +171,17 @@ else:
             # Normalize data
             row_sums = R.sum(axis=0)
             R /= row_sums[np.newaxis, :]
+            print(np.shape(R))
             # Progress bar
             progress_counter(iteration, n_avg, start_time=res_handles.get_start_time())
             # Plot results (update axes)
-            fig_live.suptitle(f"Resonator {res_key} spectroscopy vs amplitude, iteration {iteration+1}/{n_avg}")
+            fig_live.suptitle(f"Qubit {qubit_key} spectroscopy vs amplitude, iteration {iteration+1}/{n_avg}")
             if IQ:
                 # 2D color plot: pulse amplitude vs I
                 ax1.cla()
-                im1 = ax1.pcolormesh(res_spec_sweep_dfs / u.MHz, amplitudes*readout_amp, I.T, shading='auto', cmap='viridis')
+                im1 = ax1.pcolormesh(spec_sweep_dfs / u.MHz, repetitions, I.T, shading='auto', cmap='viridis')
                 ax1.set_xlabel("Frequency Detuning (MHz)")
-                ax1.set_ylabel("Pulse Amplitude (a.u.)")
+                ax1.set_ylabel("Repetitions")
                 ax1.set_title("I")
                 if not hasattr(ax1, '_colorbar'):
                     ax1._colorbar = plt.colorbar(im1, ax=ax1, label='I (V)')
@@ -172,9 +190,9 @@ else:
                 
                 # 2D color plot: pulse amplitude vs tau for Q
                 ax2.cla()
-                im2 = ax2.pcolormesh(res_spec_sweep_dfs / u.MHz, amplitudes*readout_amp, Q.T, shading='auto', cmap='viridis')
+                im2 = ax2.pcolormesh(spec_sweep_dfs / u.MHz, repetitions, Q.T, shading='auto', cmap='viridis')
                 ax2.set_xlabel("Frequency Detuning (MHz)")
-                ax2.set_ylabel("Pulse Amplitude (a.u.)")
+                ax2.set_ylabel("Repetitions")
                 ax2.set_title("Q")
                 if not hasattr(ax2, '_colorbar'):
                     ax2._colorbar = plt.colorbar(im2, ax=ax2, label='Q (V)')
@@ -183,9 +201,9 @@ else:
             else:
                 # 2D color plot: pulse amplitude vs tau
                 ax1.cla()
-                im1 = ax1.pcolormesh(res_spec_sweep_dfs / u.MHz, amplitudes*readout_amp, R.T, shading='auto', cmap='viridis')
+                im1 = ax1.pcolormesh(spec_sweep_dfs / u.MHz, repetitions, R.T, shading='auto', cmap='viridis')
                 ax1.set_xlabel("Frequency Detuning (MHz)")
-                ax1.set_ylabel("Pulse Amplitude (a.u.)")
+                ax1.set_ylabel("Repetitions")
                 ax1.set_title(r"Amplitude $R=\sqrt{I^2 + Q^2}$ (V)")
                 if not hasattr(ax1, '_colorbar'):
                     ax1._colorbar = plt.colorbar(im1, ax=ax1, label='R (V)')
@@ -194,10 +212,10 @@ else:
                 
                 # 2D color plot: pulse amplitude vs tau for phase
                 ax2.cla()
-                phase_unwrapped = np.array([signal.detrend(np.unwrap(phase[:,i])) for i in range(len(amplitudes))])
-                im2 = ax2.pcolormesh(res_spec_sweep_dfs / u.MHz, amplitudes*readout_amp, phase_unwrapped, shading='auto', cmap='viridis')
+                phase_unwrapped = np.array([signal.detrend(np.unwrap(phase[:,i])) for i in range(len(repetitions))])
+                im2 = ax2.pcolormesh(spec_sweep_dfs / u.MHz, repetitions, phase_unwrapped, shading='auto', cmap='viridis')
                 ax2.set_xlabel("Frequency Detuning (MHz)")
-                ax2.set_ylabel("Pulse Amplitude (a.u.)")
+                ax2.set_ylabel("Repetitions")
                 ax2.set_title("Phase (rad)")
                 if not hasattr(ax2, '_colorbar'):
                     ax2._colorbar = plt.colorbar(im2, ax=ax2, label='Phase (rad)')

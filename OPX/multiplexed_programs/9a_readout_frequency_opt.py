@@ -31,7 +31,7 @@ from configuration.OPX1000config import *
 ##################
 #   Parameters   #
 ##################
-n_avg = 1000  # Number of averaging loops
+n_avg = 10000  # Number of averaging loops
 qubit_key = "q1"
 required_parameters = ["resonator_key", "readout_len", "resonator_frequency", "resonator_IF", "qubit_relaxation"]
 res_key, readout_len, res_frequency, res_IF, qubit_relaxation = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
@@ -133,7 +133,6 @@ with program() as prog:
 #####################################
 #  Open Communication with the QOP  #
 #####################################
-from opx_credentials import qop_ip, cluster
 from qm import CompilerOptionArguments
 qmm = QuantumMachinesManager(host=qop_ip, cluster_name=cluster)
 

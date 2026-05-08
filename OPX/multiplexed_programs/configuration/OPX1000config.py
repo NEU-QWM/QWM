@@ -46,16 +46,16 @@ _offset_fits = np.array([0.0] * num_qubits)
 #####################################
 _resonator_keys = [f"r{i+1}" for i in range(num_qubits)]
 # _resonator_frequency = np.array([6750, 6701.889835, 6750]) * u.MHz
-_resonator_frequency = np.array([6165.31]*3) * u.MHz
-_resonator_LO = 6300 * u.MHz
-_resonator_IF = _resonator_frequency- _resonator_LO
+_resonator_frequency = np.array([6165.31, 6447.73, 6701.95]) * u.MHz
+_resonator_LO = (6300) * u.MHz
+_resonator_IF = _resonator_frequency - _resonator_LO
 _resonator_relaxation_times = [3_000] * num_qubits
 resonator_LO_band = 2
 resonator_power = 2 # dBm
 print(1_000*5_00_0)
 # Readout optimization
-_readout_lens = [1_500] * num_qubits# ns
-_readout_amplitudes = np.array([0.1]*num_qubits) #0.3
+_readout_lens = [500] * num_qubits# ns
+_readout_amplitudes = np.array([0.15]*num_qubits) #0.3
 _rotation_angles = (np.array([235.6, 0.0, 0.0, 0.0, 0.0, 0.0]) / 180) * np.pi
 _ge_thresholds = np.array([9.981e-07, 0.0, 0.0, 0.0, 0.0, 0.0]) # Ge thresholds for each qubit
 time_of_flight = 396 # ns
@@ -110,6 +110,7 @@ for i, key in enumerate(_resonator_keys):
         "operations":{
             "cw": "const_pulse",
             "readout": f"readout_pulse_{ii}",
+            "x180": f"x180_pulse_{ii}",
         },
         "time_of_flight":time_of_flight,
     }
@@ -134,18 +135,20 @@ for i, key in enumerate(_resonator_keys):
         "digital_marker": "ON",
     }
     readout_waveforms[f"readout_wf_{ii}"] = {"type": "constant", "sample": _readout_amplitudes[i]}
+
+    integration_time = 1_000
     readout_integration_weights_i = {
         f"cosine_weights_{ii}": {
-            "cosine": [(1.0, _readout_lens[i])],
-            "sine": [(0.0, _readout_lens[i])],
+            "cosine": [(1.0, integration_time)],
+            "sine": [(0.0, integration_time)],
         },
         f"sine_weights_{ii}": {
-            "cosine": [(0.0, _readout_lens[i])],
-            "sine": [(1.0, _readout_lens[i])],
+            "cosine": [(0.0, integration_time)],
+            "sine": [(1.0, integration_time)],
         },
         f"minus_sine_weights_{ii}": {
-            "cosine": [(0.0, _readout_lens[i])],
-            "sine": [(-1.0, _readout_lens[i])],
+            "cosine": [(0.0, integration_time)],
+            "sine": [(-1.0, integration_time)],
         },
         f"rotated_cosine_weights_{ii}": {
             "cosine": [(np.cos(_rotation_angles[i]), _readout_lens[i])],
@@ -178,18 +181,20 @@ for i, key in enumerate(_resonator_keys):
 # %% ---- Qubit parameters ---- #
 #################################
 _qubit_keys = [f"q{i+1}" for i in range(num_qubits)]
-_qubit_frequency = np.array([4865, 5885, 6000]) * u.MHz
-_qubit_LO = np.array([4865+47, 5885, 6000]) * u.MHz
+# _qubit_frequency = np.array([4855.0]*num_qubits) * u.MHz # center frequency
+_qubit_frequency = np.array([4865.811920]*num_qubits) * u.MHz # left peak
+# _qubit_frequency = np.array([4867.866598]*num_qubits) * u.MHz # right peak
+_qubit_LO = _qubit_frequency + 47.0 * u.MHz
 _qubit_IF = _qubit_frequency - _qubit_LO
-_qubit_relaxation_times = [1_000] * num_qubits # ns
+_qubit_relaxation_times = [3_000] * num_qubits # ns
 qubit_LO_band = [1, 2, 2]
 qubit_power = [16, 4, 4] # dBm
 
 
 # ---- Qubit operation parameters ---- #
 # Drag pulse parameters
-_x180_lens = [612, 40, 40, 40, 40, 40] # ns
-_x180_amplitudes = np.array([1.0/1, 0.3, 0.3, 0.3, 0.3, 0.3]) # Amplitude for 180 pulse
+_x180_lens = [232, 40, 40, 40, 40, 40] # ns  #612
+_x180_amplitudes = np.array([1.0, 0.3, 0.3, 0.3, 0.3, 0.3]) # Amplitude for 180 pulse
 _x90_lens = _x180_lens # ns
 _x90_amplitudes = _x180_amplitudes / 2 # Amplitude for 90 pulse
 _drag_coefficients = np.array([0.01, 0.01, 0.01, 0.01, 0.01, 0.01]) # DRAG coefficients
@@ -197,14 +202,17 @@ _anharmonicities = np.ones(_x180_amplitudes.shape) * -150 * u.MHz
 _AC_stark_detunings = np.ones(_x180_amplitudes.shape) * 0.0 * u.MHz
 
 # Saturation_pulse
-saturation_len = 3.0 * u.us
-saturation_amp = 1.0/4
+saturation_len = 0.232 * u.us
+saturation_amp = 1.0
 # Square pi pulse
 square_pi_len = 160
 square_pi_amp = 0.5
 # Constant pulse parameters 
 const_len = 100
 const_amp = 0.03
+
+# Store control amplitude
+_control_amp = np.array([saturation_amp]*num_qubits)
 
 # ---- Drag pulse parameters & generation ---- #
 def generate_drag_x180(drag_coef, anharmonicity, AC_stark_detuning, x180_len, x180_amp):
@@ -420,6 +428,7 @@ for i, key in enumerate(_qubit_keys):
         "qubit_IF": _qubit_IF[i],
         "qubit_LO": _qubit_LO[i],
         "qubit_relaxation": _qubit_relaxation_times[i],
+        "control_amp": _control_amp[i],
         "drag_coef": _drag_coefficients[i],
         "anharmonicity": _anharmonicities[i],
         "resonator_relaxation": _resonator_relaxation_times[i],

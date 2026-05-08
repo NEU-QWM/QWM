@@ -9,11 +9,13 @@
 
 function [data] = VNA_vs_PumpPower(PowerList, InitialWaitTime)
 pause on;
-PumpSource = deviceDrivers.AgilentN5183A();
-PumpSource.connect('19');
+% PumpSource = deviceDrivers.AgilentN5183A();
+PumpSource = deviceDrivers.SG22000();
+PumpSource.connect('172.31.255.67');
 
 %%%%%%%%%%%%%%%%%%%%%     RUN THE EXPERIMENT      %%%%%%%%%%%%%%%%%%%%%%%%%
 PumpSource.power = PowerList(1); % Power in dBm
+
 pause(InitialWaitTime);
 for k=1:length(PowerList)
     datetime('now')
