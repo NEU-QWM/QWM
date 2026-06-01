@@ -154,6 +154,9 @@ class RenSciDriver:
     def stopPositioning(self):
         return self.rpc('stopPositioning')
     
+    def getPosition(self, channel):
+        return self.rpc('getPosition', [channel]).get('result')*1e3
+    
     def home(self):
         for ax in [1,2]:
             self.goPosition(ax, target=0.0, amplitude = DEFAULT_AMPLITUDE , frequency =1000)

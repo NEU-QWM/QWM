@@ -4,3 +4,5 @@
 *.mat
 *.fig
 *.html
+*.DS_Store
+*.pyc
