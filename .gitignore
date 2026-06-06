@@ -6,3 +6,7 @@
 *.html
 *.DS_Store
 *.pyc
+*.csv
+*.npy
+*.h5
+*.png
