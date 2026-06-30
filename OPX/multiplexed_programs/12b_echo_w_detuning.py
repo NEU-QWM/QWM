@@ -38,9 +38,10 @@ thermalization_time = qubit_relaxation//4 # From ns to clock cycles
 # Dephasing time sweep (in clock cycles = 4ns) - minimum is 4 clock cycles
 tau_min = 20 * u.ns // 4
 tau_max = 3000 * u.ns // 4
-d_tau = 4 * u.ns // 4
+d_tau = 40 * u.ns // 4
 taus = np.arange(tau_min, tau_max + 0.1, d_tau)  # Linear sweep
 # taus = np.logspace(np.log10(tau_min), np.log10(tau_max), 21)  # Log sweep
+detuning = 5.0 * u.MHz  # in Hz
 
 # Data to save
 save_data_dict = {
@@ -63,6 +64,8 @@ with program() as prog:
     Q = declare(fixed)
     Q_st = declare_stream()
     tau = declare(int)
+
+    update_frequency(qubit_key, qubit_IF + detuning)
 
     with for_(n, 0, n < n_avg, n + 1):
         with for_(*from_array(tau, taus)):

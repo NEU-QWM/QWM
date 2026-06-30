@@ -32,7 +32,7 @@ from configuration.OPX1000config import *
 ##################
 #   Parameters   #
 ##################
-n_avg = 1000  # Number of averaging loops
+n_avg = 100000  # Number of averaging loops
 qubit_key = "q1"
 required_parameters = ["resonator_key", "readout_len", "qubit_frequency", "qubit_IF", "qubit_relaxation", "ge_threshold"]
 res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation, ge_threshold = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
@@ -40,7 +40,7 @@ res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation, ge_threshold 
 thermalization_time = qubit_relaxation//4 # From ns to clock cycles
 # Dephasing time sweep (in clock cycles = 4ns) - minimum is 4 clock cycles
 tau_min = 4
-tau_max = 2000 // 4
+tau_max = 3000 // 4
 d_tau = 40 // 4
 taus = np.arange(tau_min, tau_max + 0.1, d_tau)  # + 0.1 to add tau_max to taus
 # Detuning converted into virtual Z-rotations to observe Ramsey oscillation and get the qubit frequency
@@ -118,7 +118,6 @@ with program() as prog:
 #####################################
 #  Open Communication with the QOP  #
 #####################################
-from opx_credentials import qop_ip, cluster
 from qm import CompilerOptionArguments
 qmm = QuantumMachinesManager(host=qop_ip, cluster_name=cluster)
 

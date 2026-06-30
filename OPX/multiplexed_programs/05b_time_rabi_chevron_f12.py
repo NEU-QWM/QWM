@@ -39,10 +39,21 @@ res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation, x180_amp = si
 print(res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation, x180_amp)
 thermalization_time = qubit_relaxation//4 # From ns to clock cycles
 
-spec_span = 50 * u.MHz
+anharmonicity = -673 * u.MHz
+
+f12_IF = qubit_IF + anharmonicity
+f12_frequency = qubit_frequency + anharmonicity
+
+spec_span = 100 * u.MHz
 spec_df = 200 * u.kHz
-spec_sweep_dfs = np.arange(-spec_span//2, spec_span//2 + spec_df, spec_df)
-spec_frequency = spec_sweep_dfs + qubit_frequency
+
+spec_sweep_dfs = np.arange(
+    -spec_span // 2,
+    spec_span // 2 + spec_df,
+    spec_df,
+)
+
+spec_frequency = f12_frequency + spec_sweep_dfs
 # Pulse duration sweep (in clock cycles = 4ns) - must be larger than 4 clock cycles
 t_min = 40    * u.ns // 4
 t_max = 1000 * u.ns // 4
@@ -76,10 +87,14 @@ with program() as prog:
         with for_(*from_array(t, durations)):  # QUA for_ loop for sweeping the pulse duration
             with for_(*from_array(df, spec_sweep_dfs)):  # QUA for_ loop for sweeping the frequency
                 # Update the frequency of the digital oscillator linked to the qubit element
-                update_frequency(qubit_key, df + qubit_IF)
+                update_frequency(qubit_key, qubit_IF)
                 # Play the qubit pulse with a variable duration (in clock cycles = 4ns)
+                play("x180", qubit_key)
+
+                update_frequency(qubit_key, f12_IF + df)
+
                 play("x180", qubit_key, duration=t)
-                # Align the two elements to measure after playing the qubit pulse.
+                
                 align(qubit_key, res_key)
                 # Measure the state of the resonator.
                 # The integration weights have changed to maximize the SNR after having calibrated the IQ blobs.

@@ -28,6 +28,7 @@ from configuration.OPX1000config import *
 ##################
 #   Parameters   #
 ##################
+n_repetitions = 30
 n_avg = 20000  # Number of averaging loops
 qubit_key = "q1"
 required_parameters = ["resonator_key", "readout_len", "qubit_frequency", "qubit_IF", "qubit_relaxation", "x180_amp"]
@@ -125,59 +126,203 @@ if simulate:
     # Visualize and save the waveform report
     waveform_report.create_plot(samples, plot=True, save_path=str(Path(__file__).resolve()))
 else:
-    # Open the quantum machine
-    qm = qmm.open_qm(config, close_other_machines=True, compiler_options=CompilerOptionArguments(flags=['enable-reset-all-phases-at-program-start']))
-    # Send the QUA program to the OPX, which compiles and executes it
-    job = qm.execute(prog)
-    # Get results from QUA program
-    results = fetching_tool(job, data_list=["I", "Q", "iteration"], mode="live")
-    # Live plotting
-    fig = plt.figure()
-    interrupt_on_close(fig, job)  # Interrupts the job when closing the figure
-    while results.is_processing():
-        # Fetch results
+    qm = qmm.open_qm(
+        config,
+        close_other_machines=True,
+        compiler_options=CompilerOptionArguments(
+            flags=['enable-reset-all-phases-at-program-start']
+        )
+    )
+
+    from qualang_tools.plot.fitting import Fit
+
+    n_repetitions = 30
+
+    T1_values = []
+    I_all = []
+    Q_all = []
+    fit_results = []
+
+    fit = Fit()
+
+    # -------------------------
+    # SINGLE CONTROL FIGURE
+    # -------------------------
+    fig = plt.figure(figsize=(12, 5))
+    ax_decay = plt.subplot(121)
+    ax_hist = plt.subplot(122)
+
+    # -------------------------
+    # MAIN LOOP CONTROLLED BY FIGURE
+    # -------------------------
+    rep = 0
+
+    while rep < n_repetitions and plt.fignum_exists(fig.number):
+
+        print(f"\n========== T1 run {rep+1}/{n_repetitions} ==========")
+
+        job = qm.execute(prog)
+
+        results = fetching_tool(
+            job,
+            data_list=["I", "Q", "iteration"],
+            mode="live"
+        )
+
+        # -------------------------
+        # WAIT LOOP (QUA RUNNING)
+        # -------------------------
+        while results.is_processing() and plt.fignum_exists(fig.number):
+
+            I, Q, iteration = results.fetch_all()
+
+            I = u.demod2volts(I, readout_len)
+            Q = u.demod2volts(Q, readout_len)
+
+            progress_counter(
+                iteration,
+                n_avg,
+                start_time=results.get_start_time()
+            )
+
+            ax_decay.cla()
+            ax_decay.plot(4 * taus, Q, ".", label="Data")
+            ax_decay.set_xlabel("Delay [ns]")
+            ax_decay.set_ylabel("Q [V]")
+            ax_decay.set_title(f"T_1 run {rep+1}/{n_repetitions}")
+
+            ax_hist.cla()
+
+            if len(T1_values) > 0:
+                ax_hist.hist(T1_values, bins=min(20, len(T1_values)), alpha=0.75, edgecolor='white', linewidth=1)
+                ax_hist.axvline(np.mean(T1_values), color="r", linestyle="--",
+                                label=f"Mean={np.mean(T1_values):.0f}")
+                ax_hist.legend()
+
+            ax_hist.set_xlabel("T1 [ns]")
+            ax_hist.set_ylabel("Counts")
+
+            plt.tight_layout()
+            plt.pause(0.05)
+
+        # -------------------------
+        # STOP CONDITION (GUI CLOSED)
+        # -------------------------
+        if not plt.fignum_exists(fig.number):
+            print("Figure closed → stopping experiment.")
+            job.cancel()
+            break
+
+        # -------------------------
+        # FINAL FETCH
+        # -------------------------
         I, Q, iteration = results.fetch_all()
-        # Convert the results into Volts
-        I, Q = u.demod2volts(I, readout_len), u.demod2volts(Q, readout_len)
-        # Progress bar
-        progress_counter(iteration, n_avg, start_time=results.get_start_time())
-        # Plot results
-        plt.suptitle(f"{qubit_key}, T1 measurement, ({iteration+1}/{n_avg})")
-        plt.subplot(211)
-        plt.cla()
-        plt.plot(4 * taus, I, ".")
-        plt.ylabel("I quadrature [V]")
-        plt.subplot(212)
-        plt.cla()
-        plt.plot(4 * taus, Q, ".")
-        plt.xlabel("Qubit decay time [ns]")
-        plt.ylabel("Q quadrature [V]")
-        plt.pause(0.1)
+
+        I = u.demod2volts(I, readout_len)
+        Q = u.demod2volts(Q, readout_len)
+
+        I_all.append(I.copy())
+        Q_all.append(Q.copy())
+
+        # -------------------------
+        # FIT
+        # -------------------------
+        try:
+            decay_fit = fit.T1(4 * taus, Q, plot=False)
+
+            T1 = np.round(np.abs(decay_fit["T1"][0]) / 4) * 4
+
+            T1_values.append(T1)
+            fit_results.append({
+                "T1": float(decay_fit["T1"][0]),
+                "amp": float(decay_fit["amp"][0]),
+                "offset": float(decay_fit["final_offset"][0]),
+            })
+
+            print(f"Run {rep+1}: T1 = {T1:.0f} ns")
+
+        except Exception as e:
+            print(f"Fit failed on run {rep+1}: {e}")
+
+        # -------------------------
+        # UPDATE PLOTS
+        # -------------------------
+        ax_decay.cla()
+        ax_decay.plot(4 * taus, Q, ".", label="Data")
+
+        try:
+            A = decay_fit["amp"][0]
+            offset = decay_fit["final_offset"][0]
+            T1_fit = decay_fit["T1"][0]
+
+            fit_curve = offset + A * np.exp(-(4 * taus) / T1_fit)
+            ax_decay.plot(4 * taus, fit_curve, "-r", lw=2,
+                          label=f"T1={T1:.0f} ns")
+        except:
+            pass
+
+        ax_decay.legend()
+
+        ax_hist.cla()
+        ax_hist.hist(T1_values, bins=min(20, len(T1_values)), alpha=0.75, edgecolor='white', linewidth=1)
+
+        if len(T1_values) > 1:
+            ax_hist.axvline(np.mean(T1_values), color="r", linestyle="--",
+                            label=f"Mean={np.mean(T1_values):.0f}")
+            ax_hist.legend()
+
         plt.tight_layout()
+        plt.pause(0.05)
 
-    # Fit the results to extract the qubit decay time T1
+        rep += 1
+
+    # -------------------------
+    # SAVE (ALWAYS RUNS)
+    # -------------------------
     try:
-        from qualang_tools.plot.fitting import Fit
+        print("Saving data...")
 
-        fit = Fit()
-        fig_fit = plt.figure()
-        decay_fit = fit.T1(4 * taus, Q, plot=True)
-        qubit_T1 = np.round(np.abs(decay_fit["T1"][0]) / 4) * 4
-        plt.xlabel("Delay [ns]")
-        plt.ylabel("Q quadrature [V]")
-        print(f"Qubit decay time to update in the config: qubit_T1 = {qubit_T1:.0f} ns")
-        plt.legend((f"Relaxation time T1 = {qubit_T1:.0f} ns",))
-        plt.title(f"{qubit_key}, T1 measurement")
-        save_data_dict.update({"fig_fit": fig_fit})
-    except (Exception,):
+        script_name = Path(__file__).name
+
+        save_data_dict.update({
+            "I_all": np.array(I_all),
+            "Q_all": np.array(Q_all),
+            "T1_values": np.array(T1_values),
+            "fit_results": fit_results,
+            "live_figure": fig,
+        })
+
+        data_handler = DataHandler(root_data_folder=save_dir)
+        data_handler.additional_files = {**default_additional_files}
+
+        data_handler.save_data(
+            data=save_data_dict,
+            name="_".join(script_name.split("_")[1:]).split(".")[0]
+        )
+
+        print("SAVE SUCCESSFUL")
+
+    except Exception as e:
+        print("SAVE FAILED — dumping raw fallback data")
+
+        fallback_file = save_dir / "T1_backup.npy"
+
+        np.save(
+            fallback_file,
+            {
+                "T1_values": T1_values,
+                "I_all": I_all,
+                "Q_all": Q_all
+            },
+            allow_pickle=True
+        )
+
+        print(f"Backup saved to {fallback_file}")
+        raise e
+
+    try:
+        qm.close()
+    except:
         pass
-    # Save results
-    script_name = Path(__file__).name
-    data_handler = DataHandler(root_data_folder=save_dir)
-    save_data_dict.update({"I_data": I})
-    save_data_dict.update({"Q_data": Q})
-    save_data_dict.update({"fig_live": fig})
-    data_handler.additional_files = {**default_additional_files}
-    data_handler.save_data(data=save_data_dict, name="_".join(script_name.split("_")[1:]).split(".")[0])
+
     plt.show()
-    qm.close()

@@ -33,7 +33,7 @@ from configuration.OPX1000config import *
 ##################
 #   Parameters   #
 ##################
-n_avg = 100000  # Number of averaging loops
+n_avg = 1_000_000  # Number of averaging loops
 qubit_key = "q1"
 required_parameters = ["resonator_key", "readout_len", "qubit_frequency", "qubit_IF", "qubit_relaxation", "readout_amp"]
 res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation, readout_amp = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)

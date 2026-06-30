@@ -46,16 +46,16 @@ depletion_time = res_relaxation//4 # From ns to clock cycles
 
 res_frequency = res_frequency
 res_spec_span = 5 * u.MHz
-res_spec_df = 80 * u.kHz
+res_spec_df = 20 * u.kHz
 res_spec_sweep_dfs = np.arange(-res_spec_span//2, res_spec_span//2 + res_spec_df, res_spec_df)
 res_spec_frequency = res_spec_sweep_dfs + res_frequency
 
 # Pulse amplitude sweep (as a pre-factor of the qubit pulse amplitude) - must be within [-2; 2)
-a_min = 0.02
+a_min = 0.002
 a_max = 1.96
 d_a = 0.02
-# amplitudes = np.arange(a_min, a_max+d_a, d_a)
-amplitudes = np.logspace(-3, 0, 100, endpoint=True)
+amplitudes = np.arange(a_min, a_max+d_a, d_a)
+# amplitudes = np.logspace(-3, 0, 256, endpoint=True)
 
 # Data to save
 save_data_dict = {
@@ -203,8 +203,10 @@ else:
                     ax2._colorbar = plt.colorbar(im2, ax=ax2, label='Phase (rad)')
                 else:
                     ax2._colorbar.update_normal(im2)
-            ax1.set_yscale('log')
-            ax2.set_yscale('log')
+            # ax1.set_yscale('log')
+            # ax2.set_yscale('log')
+            ax1.set_yscale('linear')
+            ax2.set_yscale('linear')
             fig_live.tight_layout()
             fig_live.canvas.draw_idle()
             plt.pause(0.1)

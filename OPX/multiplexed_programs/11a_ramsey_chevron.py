@@ -30,7 +30,7 @@ from configuration.OPX1000config import *
 ##################
 #   Parameters   #
 ##################
-n_avg = 1000  # Number of averaging loops
+n_avg = 20000  # Number of averaging loops
 qubit_key = "q1"
 required_parameters = ["resonator_key", "readout_len", "qubit_frequency", "qubit_IF", "qubit_relaxation"]
 res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
@@ -38,13 +38,13 @@ res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation = single_qubit
 thermalization_time = qubit_relaxation//4 # From ns to clock cycles
 
 # Frequency sweep in Hz
-freq_span = 10 * u.MHz
-df = 25 * u.kHz
-dfs = np.arange(-freq_span, freq_span, df)
+freq_span = 50 * u.MHz
+df = 50 * u.kHz
+dfs = np.arange(-freq_span // 2, freq_span // 2, df)
 
 # Idle time sweep (Needs to be a list of integers) - in clock cycles (4ns)
-tau_max = 4000 // 4
-d_tau = 40 // 4
+tau_max = 1000 // 4
+d_tau = 16 // 4
 taus = np.arange(0, tau_max, d_tau)
 if len(np.where((taus > 0) & (taus < 4))[0]) > 0:
     raise Exception("Delay must be either 0 or an integer larger than 4.")

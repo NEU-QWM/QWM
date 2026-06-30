@@ -53,10 +53,21 @@ thermalization_time = 10.0 * u.us //4 # From ns to clock cycles
 
 print(f"Qubit frequency is {qubit_IF}")
 
-spec_span = 500 * u.MHz
+anharmonicity = -300 * u.MHz
+
+f12_IF = qubit_IF + anharmonicity
+f12_frequency = qubit_frequency + anharmonicity
+
+spec_span = 1000 * u.MHz
 spec_df = 20 * u.kHz
-spec_sweep_dfs = np.arange(-spec_span//2, spec_span//2 + spec_df, spec_df)
-spec_frequency = spec_sweep_dfs + qubit_frequency
+
+spec_sweep_dfs = np.arange(
+    -spec_span // 2,
+    spec_span // 2 + spec_df,
+    spec_df,
+)
+
+spec_frequency = f12_frequency + spec_sweep_dfs
 
 # ---- Data to save ---- #
 save_data_dict = {
@@ -82,13 +93,17 @@ with program() as prog:
 
     with for_(n, 0, n < n_avg, n + 1):
         with for_(*from_array(df, spec_sweep_dfs)):
-            # Update the frequency of the digital oscillator linked to the qubit element
-            update_frequency(qubit_key, df + qubit_IF)
-            # Play the saturation pulse to put the qubit in a mixed state - Can adjust the amplitude on the fly [-2; 2)
-            play("saturation", qubit_key)
-            # play("x180", qubit_key)
+            # Update the frequency back to f_01
+            update_frequency(qubit_key, qubit_IF)
+            # Play the pi pulse to put the qubit in 1 state
+            play("x180", qubit_key)            
+            # Update the frequency to sweep f_12
+            update_frequency(qubit_key, f12_IF + df)
+            # Play the saturation pulse to excite the 1 -> 2 transition
+            play("saturation"*amp(1.75), qubit_key)
             # Align the two elements to measure after playing the qubit pulse.
             # One can also measure the resonator while driving the qubit by commenting the 'align'
+            # wait(128 // 4, qubit_key)
             align(qubit_key, res_key)
             # Measure the state of the resonator
             measure(

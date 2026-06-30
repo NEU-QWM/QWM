@@ -30,7 +30,7 @@ from configuration.OPX1000config import *
 ##################
 #   Parameters   #
 ##################
-n_avg = 10000  # Number of averaging loops
+n_avg = 100000  # Number of averaging loops
 qubit_key = "q1"
 required_parameters = ["resonator_key", "readout_len", "qubit_frequency", "qubit_IF", "qubit_relaxation"]
 res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
@@ -42,7 +42,7 @@ tau_max = 6_000 // 4
 d_tau = 40 // 4
 taus = np.arange(tau_min, tau_max + 0.1, d_tau)  # + 0.1 to add tau_max to taus
 # Detuning converted into virtual Z-rotations to observe Ramsey oscillation and get the qubit frequency
-detuning = 1 * u.MHz  # in Hz
+detuning = 10.0 * u.MHz  # in Hz
 
 # Data to save
 save_data_dict = {

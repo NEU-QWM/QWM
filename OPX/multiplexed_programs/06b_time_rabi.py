@@ -31,16 +31,16 @@ from configuration.OPX1000config import *
 #   Parameters   #
 ##################
 # Parameters Definition
-n_avg = 6000  # Number of averaging loops
+n_avg = 100_000  # Number of averaging loops
 qubit_key = "q1"
 required_parameters = ["resonator_key", "readout_len", "qubit_frequency", "qubit_IF", "qubit_relaxation", "x180_amp"]
 res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation, x180_amp = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
 
 thermalization_time = qubit_relaxation//4 # From ns to clock cycles
 # Pulse duration sweep (in clock cycles = 4ns) - must be larger than 4 clock cycles
-t_min = 20 * u.ns // 4
-t_max = 2000 * u.ns // 4
-dt = 12 * u.ns // 4
+t_min = 40 * u.ns // 4
+t_max = 1000 * u.ns // 4
+dt = 4 * u.ns // 4
 durations = np.arange(t_min, t_max, dt)
 
 # Data to save

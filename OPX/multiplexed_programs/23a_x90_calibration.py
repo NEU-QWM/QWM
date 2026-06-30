@@ -53,8 +53,8 @@ thermalization_time = 4.0 * u.us //4 # From ns to clock cycles
 
 print(f"Qubit frequency is {qubit_IF}")
 
-spec_span = 2500 * u.MHz
-spec_df = 500 * u.kHz
+spec_span = 100 * u.MHz
+spec_df = 200 * u.kHz
 spec_sweep_dfs = np.arange(-spec_span//2, spec_span//2 + spec_df, spec_df)
 spec_frequency = spec_sweep_dfs + qubit_frequency
 
@@ -95,7 +95,10 @@ with program() as prog:
             update_frequency(qubit_key, df + qubit_IF)
             with for_each_(a,amplitudes):
                 # Play the saturation pulse to put the qubit in a mixed state - Can adjust the amplitude on the fly [-2; 2)
-                play("saturation" * amp(a), qubit_key)
+                play("x90" * amp(a), qubit_key)
+                play("x90" * amp(a), qubit_key)
+                play("x90" * amp(a), qubit_key)
+                play("x90" * amp(a), qubit_key)
                 # Align the two elements to measure after playing the qubit pulse.
                 # One can also measure the resonator while driving the qubit by commenting the 'align'
                 align(qubit_key, res_key)

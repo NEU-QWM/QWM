@@ -1,16 +1,17 @@
 """
-        ECHO MEASUREMENT
-The program consists in playing a Ramsey sequence with an echo pulse in the middle to compensate for dephasing and
-enhance the coherence time (x90 - idle_time - x180 - idle_time - x90 - measurement) for different idle times.
-Here the gates are on resonance so no oscillation is expected.
-
-From the results, one can fit the exponential decay and extract T2.
+        TIME RABI
+The sequence consists in playing the qubit pulse (x180 or square_pi or else) and measuring the state of the resonator
+for different qubit pulse durations.
+The results are then post-processed to find the qubit pulse duration for the chosen amplitude.
 
 Prerequisites:
     - Having found the resonance frequency of the resonator coupled to the qubit under study (resonator_spectroscopy).
-    - Having calibrated qubit pi pulse (x180) by running qubit, spectroscopy, rabi_chevron, power_rabi and updated the config.
-    - Having the qubit frequency perfectly calibrated (ramsey).
-    - (optional) Having calibrated the readout (readout_frequency, amplitude, duration_optimization IQ_blobs) for better SNR.
+    - Having calibrated the IQ mixer connected to the qubit drive line (external mixer or Octave port)
+    - Having found the rough qubit frequency and pi pulse amplitude (rabi_chevron_amplitude or power_rabi).
+    - Set the qubit frequency and desired pi pulse amplitude (x180_amp) in the configuration.
+
+Next steps before going to the next node:
+    - Update the qubit pulse duration (x180_len) in the configuration.
 """
 
 from qm.qua import *
@@ -19,7 +20,7 @@ from qm import SimulationConfig
 from configuration import *
 from qualang_tools.results import progress_counter, fetching_tool
 from qualang_tools.plot import interrupt_on_close
-from qualang_tools.loops import from_array, get_equivalent_log_array
+from qualang_tools.loops import from_array
 import matplotlib.pyplot as plt
 from qualang_tools.results.data_handler import DataHandler
 from macros import single_qubit_parser
@@ -29,24 +30,24 @@ from configuration.OPX1000config import *
 ##################
 #   Parameters   #
 ##################
-n_avg = 100000  # Number of averaging loops
+# Parameters Definition
+n_avg = 100_000  # Number of averaging loops
 qubit_key = "q1"
-required_parameters = ["resonator_key", "readout_len", "qubit_frequency", "qubit_IF", "qubit_relaxation", "x180_amp"]
-res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation, x180_amp = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
+required_parameters = ["resonator_key", "readout_len", "qubit_frequency", "qubit_IF", "qubit_relaxation", "x90_amp"]
+res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation, x90_amp = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
 
 thermalization_time = qubit_relaxation//4 # From ns to clock cycles
-# Dephasing time sweep (in clock cycles = 4ns) - minimum is 4 clock cycles
-tau_min = 20 * u.ns // 4
-tau_max = 3000 * u.ns // 4
-d_tau = 4 * u.ns // 4
-taus = np.arange(tau_min, tau_max + 0.1, d_tau)  # Linear sweep
-# taus = np.logspace(np.log10(tau_min), np.log10(tau_max), 21)  # Log sweep
+# Pulse duration sweep (in clock cycles = 4ns) - must be larger than 4 clock cycles
+t_min = 40 * u.ns // 4
+t_max = 1000 * u.ns // 4
+dt = 4 * u.ns // 4
+durations = np.arange(t_min, t_max, dt)
 
 # Data to save
 save_data_dict = {
-    "qubit": qubit_key,
+    "qubit_key": qubit_key,
     "n_avg": n_avg,
-    "taus": taus,
+    "durations": durations,
     "config": config,
 }
 save_dir = Path(__file__).resolve().parent / "data"
@@ -56,34 +57,28 @@ save_dir = Path(__file__).resolve().parent / "data"
 ###################
 with program() as prog:
     reset_global_phase()
-    n = declare(int)
-    n_st = declare_stream()
-    I = declare(fixed)
-    I_st = declare_stream()
-    Q = declare(fixed)
-    Q_st = declare_stream()
-    tau = declare(int)
+    n = declare(int)  # QUA variable for the averaging loop
+    t = declare(int)  # QUA variable for the qubit pulse duration
+    I = declare(fixed)  # QUA variable for the measured 'I' quadrature
+    Q = declare(fixed)  # QUA variable for the measured 'Q' quadrature
+    I_st = declare_stream()  # Stream for the 'I' quadrature
+    Q_st = declare_stream()  # Stream for the 'Q' quadrature
+    n_st = declare_stream()  # Stream for the averaging iteration 'n'
 
-    with for_(n, 0, n < n_avg, n + 1):
-        with for_(*from_array(tau, taus)):
-            # 1st x90 pulse
-            play("x90", qubit_key)
-            # Wait the varying idle time
-            wait(tau, qubit_key)
-            # Echo pulse
-            play("x180", qubit_key)
-            # Wait the varying idle time
-            wait(tau, qubit_key)
-            # 2nd x90 pulse
-            play("x90", qubit_key)
+    with for_(n, 0, n < n_avg, n + 1):  # QUA for_ loop for averaging
+        with for_(*from_array(t, durations)):  # QUA for_ loop for sweeping the pulse duration
+            # Play the qubit pulse with a variable duration (in clock cycles = 4ns)
+            play("x90", qubit_key, duration=t)
+            play("x90", qubit_key, duration=t)
             # Align the two elements to measure after playing the qubit pulse.
             align(qubit_key, res_key)
             # Measure the state of the resonator
+            # The integration weights have changed to maximize the SNR after having calibrated the IQ blobs.
             measure(
                 "readout",
                 res_key,
-                dual_demod.full("opt_cos", "opt_sin", I),
-                dual_demod.full("opt_minus_sin", "opt_cos", Q),
+                dual_demod.full("rotated_cos", "rotated_sin", I),
+                dual_demod.full("rotated_minus_sin", "rotated_cos", Q),
             )
             # Wait for the qubit to decay to the ground state
             wait(thermalization_time, res_key)
@@ -95,22 +90,13 @@ with program() as prog:
 
     with stream_processing():
         # Cast the data into a 1D vector, average the 1D vectors together and store the results on the OPX processor
-        # If log sweep, then the swept values will be slightly different from np.logspace because of integer rounding in QUA.
-        # get_equivalent_log_array() is used to get the exact values used in the QUA program.
-        if np.isclose(np.std(taus[1:] / taus[:-1]), 0, atol=1e-3):
-            taus = get_equivalent_log_array(taus)
-            I_st.buffer(len(taus)).average().save("I")
-            Q_st.buffer(len(taus)).average().save("Q")
-        else:
-            I_st.buffer(len(taus)).average().save("I")
-            Q_st.buffer(len(taus)).average().save("Q")
+        I_st.buffer(len(durations)).average().save("I")
+        Q_st.buffer(len(durations)).average().save("Q")
         n_st.save("iteration")
 
-######################################
+#####################################
 #  Open Communication with the QOP  #
-######################################
-# from opx_credentials import qop_ip, cluster
-from qm import CompilerOptionArguments
+#####################################
 qmm = QuantumMachinesManager(host=qop_ip, cluster_name=cluster)
 
 simulate = False
@@ -118,7 +104,7 @@ if simulate:
     # Simulates the QUA program for the specified duration
     simulation_config = SimulationConfig(duration=2_000)  # In clock cycles = 4ns
     # Simulate blocks python until the simulation is done
-    job = qmm.simulate(config, prog, simulation_config, compiler_options=CompilerOptionArguments(flags=['enable-reset-all-phases-at-program-start']))
+    job = qmm.simulate(config, prog, simulation_config)
     # Get the simulated samples
     samples = job.get_simulated_samples()
     # Plot the simulated samples
@@ -131,7 +117,7 @@ if simulate:
     waveform_report.create_plot(samples, plot=True, save_path=str(Path(__file__).resolve()))
 else:
     # Open the quantum machine
-    qm = qmm.open_qm(config, close_other_machines=True, compiler_options=CompilerOptionArguments(flags=['enable-reset-all-phases-at-program-start']))
+    qm = qmm.open_qm(config, close_other_machines=True)
     # Send the QUA program to the OPX, which compiles and executes it
     job = qm.execute(prog)
     # Get results from QUA program
@@ -147,33 +133,31 @@ else:
         # Progress bar
         progress_counter(iteration, n_avg, start_time=results.get_start_time())
         # Plot results
-        plt.suptitle(f"{qubit_key}, Echo measurement ({iteration+1}/{n_avg})")
+        plt.suptitle(f"x90 length cal {qubit_key}, iteration {iteration+1}/{n_avg}")
         plt.subplot(211)
         plt.cla()
-        plt.plot(8 * taus, I, ".")
+        plt.plot(4 * durations, I, ".")
         plt.ylabel("I quadrature [V]")
         plt.subplot(212)
         plt.cla()
-        plt.plot(8 * taus, Q, ".")
-        plt.xlabel("Idle time [ns]")
+        plt.plot(4 * durations, Q, ".")
+        plt.xlabel("x90 pulse length [ns]")
         plt.ylabel("Q quadrature [V]")
         plt.pause(0.1)
         plt.tight_layout()
-
-    # Fit the results to extract the qubit coherence time T2
+    plt.show()
+    # Fit the results to extract the x180 length
     try:
         from qualang_tools.plot.fitting import Fit
 
         fit = Fit()
-        fig_fit = plt.figure()
-        T2_fit = fit.T1(8 * taus, Q, plot=True)
-        qubit_T2 = np.abs(T2_fit["T1"][0])
-        plt.xlabel("Delay [ns]")
-        plt.ylabel("Q quadrature [V]")
-        print(f"Qubit coherence time T2 = {qubit_T2:.0f} ns")
-        plt.legend((f"Coherence time T2 = {qubit_T2:.0f} ns",))
-        plt.title(f"{qubit_key}, Echo measurement")
-        save_data_dict.update({"fig_fit": fig_fit})
+        plt.figure()
+        rabi_fit = fit.rabi(4 * durations, Q, plot=True)
+        plt.title(f"x90 length cal")
+        plt.xlabel("x90 pulse length [ns]")
+        plt.ylabel("I quadrature [V]")
+        print(f"Optimal x90_len = {round(1 / rabi_fit['f'][0] / 2 / 4) * 4} ns for {x90_amp:} V")
+        plt.show()
     except (Exception,):
         pass
     # Save results
@@ -184,6 +168,5 @@ else:
     save_data_dict.update({"fig_live": fig})
     data_handler.additional_files = {**default_additional_files}
     data_handler.save_data(data=save_data_dict, name="_".join(script_name.split("_")[1:]).split(".")[0])
-
-    plt.show()
+    
     qm.close()

@@ -26,22 +26,22 @@ from scipy import signal
 from qualang_tools.results.data_handler import DataHandler
 from macros import single_qubit_parser
 
-from configuration.OPX1000config import *
+from configuration.OPX1000config_test import *
 
 ##################
 #   Parameters   #
 ##################
 # Parameters Definition
-n_avg = 5_000  # Number of averaging loops
+n_avg = 1_000  # Number of averaging loops
 qubit_key = "q1"
 required_parameters = ["resonator_key", "resonator_relaxation", "resonator_frequency", "resonator_IF", "readout_len", "readout_amp"]
 res_key, res_relaxation, res_frequency, res_IF, readout_len, readout_amp = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
 
-depletion_time = 4*res_relaxation//4 # From ns to clock cycles
+depletion_time = res_relaxation//4 # From ns to clock cycles
 
 res_frequency = res_frequency
-res_spec_span = 10 * u.MHz
-res_spec_df = 5 * u.kHz
+res_spec_span = 100 * u.MHz
+res_spec_df = 20 * u.kHz
 res_spec_sweep_dfs = np.arange(-res_spec_span//2, res_spec_span//2 + res_spec_df, res_spec_df)
 res_spec_frequency = res_spec_sweep_dfs + res_frequency
 
@@ -69,10 +69,6 @@ with program() as prog:
     with for_(n, 0, n < n_avg, n + 1):
         with for_(*from_array(df, res_spec_sweep_dfs)):
             update_frequency(res_key, df + res_IF) # Update the frequency of the digital oscillator linked to the resonator element
-            # Play the x180 gate to put the qubit in the excited state
-            play("x180", qubit_key)
-            # wait(4 // 4, qubit_key)
-            align(qubit_key, res_key)
             measure(
                 "readout",
                 res_key,

@@ -32,7 +32,7 @@ from configuration.OPX1000config import *
 #   Parameters   #
 ##################
 # Parameters Definition
-n_avg = 4000  # Number of averaging loops
+n_avg = 5_000  # Number of averaging loops
 qubit_key = "q1"
 required_parameters = ["resonator_key", "resonator_relaxation", "resonator_frequency", "resonator_IF", "readout_len", "readout_amp"]
 res_key, res_relaxation, res_frequency, res_IF, readout_len, readout_amp = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
@@ -40,8 +40,8 @@ res_key, res_relaxation, res_frequency, res_IF, readout_len, readout_amp = singl
 depletion_time = res_relaxation//4 # From ns to clock cycles
 
 res_frequency = res_frequency
-res_spec_span = 20 * u.MHz
-res_spec_df = 40 * u.kHz
+res_spec_span = 10 * u.MHz
+res_spec_df = 5 * u.kHz
 res_spec_sweep_dfs = np.arange(-res_spec_span//2, res_spec_span//2 + res_spec_df, res_spec_df)
 res_spec_frequency = res_spec_sweep_dfs + res_frequency
 

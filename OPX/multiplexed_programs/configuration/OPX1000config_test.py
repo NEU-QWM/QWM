@@ -8,7 +8,6 @@ u = unit(coerce_to_integer=True)
 
 qop_ip = "172.31.255.63"
 cluster = "Cluster_1"
-qop_port = None
 
 con = "con1" # Controller name in OPX1000
 mw_fem = 1 # MW-FEM slot in OPX1000
@@ -21,11 +20,11 @@ OPX resonator input: con1, fem1, ch2
 OPX qubit output:    con1, fem1, ch4
 OPX flux lines:      con1, fem2, ch1..num_qubits
 '''
-resonator_analogOutput = (con, mw_fem, 2) # Controller, FEM, channel
-resonator_analogInput = (con, mw_fem, 1) # Controller, FEM, channel
+resonator_analogOutput = (con, mw_fem, 4) # Controller, FEM, channel
+resonator_analogInput = (con, mw_fem, 2) # Controller, FEM, channel
 qubit_analogOutput = [(con, mw_fem, 6), (con, mw_fem, 6), (con, mw_fem, 6)] # Controller, FEM, channel
 
-num_qubits = 1
+num_qubits = 2
 #########################################
 # %% ---- Flux line parameters ---- #
 #########################################
@@ -46,18 +45,18 @@ _offset_fits = np.array([0.0] * num_qubits)
 # %% ---- Resonator parameters ---- #
 #####################################
 _resonator_keys = [f"r{i+1}" for i in range(num_qubits)]
-_resonator_frequency = np.array([6117.754062]*num_qubits) * u.MHz
-_resonator_LO = 6100 * u.MHz
-_resonator_IF = _resonator_frequency - _resonator_LO + 47 * u.MHz
-_resonator_relaxation_times = [2_000] * num_qubits
+_resonator_frequency = np.array([5979.54, 5981.507122]) * u.MHz
+_resonator_LO = 5979.54 * u.MHz
+_resonator_IF = _resonator_frequency - _resonator_LO
+_resonator_relaxation_times = [5_000] * num_qubits
 resonator_LO_band = 2
-resonator_power = 2 # dBm
+resonator_power = 10 # dBm
 # Readout optimization
-_readout_lens = [500] * num_qubits # ns
-_readout_amplitudes = np.array([0.30]*num_qubits) #0.25
+_readout_lens = [200] * num_qubits# ns
+_readout_amplitudes = np.array([0.15]*num_qubits) #0.3
 _rotation_angles = (np.array([235.6, 0.0, 0.0, 0.0, 0.0, 0.0]) / 180) * np.pi
 _ge_thresholds = np.array([9.981e-07, 0.0, 0.0, 0.0, 0.0, 0.0]) # Ge thresholds for each qubit
-time_of_flight = 400 # ns
+time_of_flight = 404 # ns
 
 default_additional_files = {
     # Path(__file__).name: Path(__file__).name,
@@ -180,26 +179,29 @@ for i, key in enumerate(_resonator_keys):
 # %% ---- Qubit parameters ---- #
 #################################
 _qubit_keys = [f"q{i+1}" for i in range(num_qubits)]
-_qubit_frequency = np.array([4474.230021]*num_qubits) * u.MHz
+# _qubit_frequency = np.array([4855.0]*num_qubits) * u.MHz # center frequency
+_qubit_frequency = np.array([4459.229604]*num_qubits) * u.MHz # left peak
+# _qubit_frequency = np.array([4867.866598]*num_qubits) * u.MHz # right peak
 _qubit_LO = _qubit_frequency + 47.0 * u.MHz
 _qubit_IF = _qubit_frequency - _qubit_LO
-_qubit_relaxation_times = [5_000] * num_qubits # ns
+_qubit_relaxation_times = [3_000] * num_qubits # ns
 qubit_LO_band = [1, 2, 2]
-qubit_power = [6, 4, 4] # dBm # 6
+qubit_power = [16, 4, 4] # dBm
+
 
 # ---- Qubit operation parameters ---- #
 # Drag pulse parameters
-_x180_lens = [96, 40, 40, 40, 40, 40] # ns  #104
-_x180_amplitudes = np.array([0.2, 0.3, 0.3, 0.3, 0.3, 0.3]) # 0.20
-_x90_lens = [100, 40, 40, 40, 40, 40] # ns # 156
-_x90_amplitudes = np.array([0.10, 0.3, 0.3, 0.3, 0.3, 0.3]) # 0.10
-_drag_coefficients = np.array([0.36, 0.01, 0.01, 0.01, 0.01, 0.01]) # DRAG coefficients
+_x180_lens = [128, 40, 40, 40, 40, 40] # ns  #612
+_x180_amplitudes = np.array([0.16, 0.3, 0.3, 0.3, 0.3, 0.3]) # Amplitude for 180 pulse
+_x90_lens = _x180_lens # ns
+_x90_amplitudes = _x180_amplitudes / 2 # Amplitude for 90 pulse
+_drag_coefficients = np.array([0.01, 0.01, 0.01, 0.01, 0.01, 0.01]) # DRAG coefficients
 _anharmonicities = np.ones(_x180_amplitudes.shape) * -150 * u.MHz
 _AC_stark_detunings = np.ones(_x180_amplitudes.shape) * 0.0 * u.MHz
 
 # Saturation_pulse
-saturation_len = 5.0 * u.us
-saturation_amp = 1.0
+saturation_len = 1.000 * u.us
+saturation_amp = 0.16
 # Square pi pulse
 square_pi_len = 160
 square_pi_amp = 0.5

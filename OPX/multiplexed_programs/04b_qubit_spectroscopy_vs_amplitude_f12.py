@@ -53,13 +53,24 @@ thermalization_time = 4.0 * u.us //4 # From ns to clock cycles
 
 print(f"Qubit frequency is {qubit_IF}")
 
-spec_span = 2500 * u.MHz
-spec_df = 500 * u.kHz
-spec_sweep_dfs = np.arange(-spec_span//2, spec_span//2 + spec_df, spec_df)
-spec_frequency = spec_sweep_dfs + qubit_frequency
+anharmonicity = -0 * u.MHz
+
+f12_IF = qubit_IF + anharmonicity
+f12_frequency = qubit_frequency + anharmonicity
+
+spec_span = 1000 * u.MHz
+spec_df = 200 * u.kHz
+
+spec_sweep_dfs = np.arange(
+    -spec_span // 2,
+    spec_span // 2 + spec_df,
+    spec_df,
+)
+
+spec_frequency = f12_frequency + spec_sweep_dfs
 
 # Pulse amplitude sweep (as a pre-factor of the qubit pulse amplitude) - must be within [-2; 2)
-a_min = 0.04
+a_min = 0.02
 a_max = 1.96
 d_a = 0.02
 amplitudes = np.arange(a_min, a_max+d_a, d_a)
@@ -91,10 +102,12 @@ with program() as prog:
 
     with for_(n, 0, n < n_avg, n + 1):
         with for_(*from_array(df, spec_sweep_dfs)):
-            # Update the frequency of the digital oscillator linked to the qubit element
-            update_frequency(qubit_key, df + qubit_IF)
             with for_each_(a,amplitudes):
+                # Play the x180 pulse at the f_01 frequency
+                update_frequency(qubit_key, qubit_IF)
+                play("x180", qubit_key)
                 # Play the saturation pulse to put the qubit in a mixed state - Can adjust the amplitude on the fly [-2; 2)
+                update_frequency(qubit_key, f12_IF + df)
                 play("saturation" * amp(a), qubit_key)
                 # Align the two elements to measure after playing the qubit pulse.
                 # One can also measure the resonator while driving the qubit by commenting the 'align'
@@ -170,7 +183,7 @@ else:
             # Progress bar
             progress_counter(iteration, n_avg, start_time=res_handles.get_start_time())
             # Plot results (update axes)
-            fig_live.suptitle(f"Qubit {qubit_key} spectroscopy vs amplitude, iteration {iteration+1}/{n_avg}")
+            fig_live.suptitle(f"Resonator {res_key} spectroscopy vs amplitude, iteration {iteration+1}/{n_avg}")
             if IQ:
                 # 2D color plot: pulse amplitude vs I
                 ax1.cla()

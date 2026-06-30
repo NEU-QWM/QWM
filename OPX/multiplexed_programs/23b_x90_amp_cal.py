@@ -1,15 +1,5 @@
 """
-        T1 MEASUREMENT
-The sequence consists in putting the qubit in the excited stated by playing the x180 pulse and measuring the resonator
-after a varying time. The qubit T1 is extracted by fitting the exponential decay of the measured quadratures.
-
-Prerequisites:
-    - Having found the resonance frequency of the resonator coupled to the qubit under study (resonator_spectroscopy).
-    - Having calibrated qubit pi pulse (x180) by running qubit, spectroscopy, rabi_chevron, power_rabi and updated the config.
-    - (optional) Having calibrated the readout (readout_frequency, amplitude, duration_optimization IQ_blobs) for better SNR.
-
-Next steps before going to the next node:
-    - Update the qubit T1 (qubit_T1) in the configuration.
+    x90 cal
 """
 
 from qm.qua import *
@@ -18,7 +8,7 @@ from qm import SimulationConfig
 from configuration import *
 from qualang_tools.results import progress_counter, fetching_tool
 from qualang_tools.plot import interrupt_on_close
-from qualang_tools.loops import from_array, get_equivalent_log_array
+from qualang_tools.loops import from_array
 import matplotlib.pyplot as plt
 from qualang_tools.results.data_handler import DataHandler
 from macros import single_qubit_parser
@@ -28,61 +18,61 @@ from configuration.OPX1000config import *
 ##################
 #   Parameters   #
 ##################
-n_avg = 20000  # Number of averaging loops
+# Parameters Definition
+n_avg = 500000  # Number of averaging loops
 qubit_key = "q1"
-required_parameters = ["resonator_key", "readout_len", "qubit_frequency", "qubit_IF", "qubit_relaxation", "x180_amp"]
-res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation, x180_amp = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
+required_parameters = ["resonator_key", "readout_len", "qubit_frequency", "qubit_IF", "qubit_relaxation", "x90_amp"]
+res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation, x90_amp = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
 
 thermalization_time = qubit_relaxation//4 # From ns to clock cycles
-# The wait time sweep (in clock cycles = 4ns) - must be larger than 4 clock cycles
-tau_min = 16 # // 4
-tau_max = 12_000 # // 4
-d_tau = 128 // 4
-# taus = np.arange(tau_min, tau_max + 0.1, d_tau)  # Linear sweep
-taus = np.logspace(np.log10(tau_min), np.log10(tau_max), 200, endpoint=True)  # Log sweep
-taus = np.array(np.unique(taus//4), dtype=int)
-print(taus)
+# Pulse amplitude sweep (as a pre-factor of the qubit pulse amplitude) - must be within [-2; 2)
+a_min = 0.05
+a_max = 1.95
+d_a = 0.05
+amplitudes = np.arange(a_min, a_max+d_a//2, d_a)
 
 # Data to save
 save_data_dict = {
-    "qubit": qubit_key,
+    "qubit_key": qubit_key,
     "n_avg": n_avg,
-    "taus": taus,
+    "amplitudes": amplitudes,
     "config": config,
 }
 save_dir = Path(__file__).resolve().parent / "data"
-
+#%%
 ###################
 # The QUA program #
 ###################
 with program() as prog:
     reset_global_phase()
     n = declare(int)  # QUA variable for the averaging loop
-    t = declare(int)  # QUA variable for the wait time
+    a = declare(fixed)  # QUA variable for the qubit drive amplitude pre-factor
     I = declare(fixed)  # QUA variable for the measured 'I' quadrature
     Q = declare(fixed)  # QUA variable for the measured 'Q' quadrature
     I_st = declare_stream()  # Stream for the 'I' quadrature
     Q_st = declare_stream()  # Stream for the 'Q' quadrature
     n_st = declare_stream()  # Stream for the averaging iteration 'n'
 
-    with for_(n, 0, n < n_avg, n + 1):
-        with for_each_(t, taus):
-            # Play the x180 gate to put the qubit in the excited state
-            play("x180", qubit_key)
-            # Wait a varying time after putting the qubit in the excited state
-            wait(t, qubit_key)
-            # Align the two elements to measure after having waited a time "tau" after the qubit pulse.
+    with for_(n, 0, n < n_avg, n + 1):  # QUA for_ loop for averaging
+        with for_(*from_array(a, amplitudes)):  # QUA for_ loop for sweeping the pulse amplitude pre-factor
+            # Play the qubit pulse with a variable amplitude (pre-factor to the pulse amplitude defined in the config)
+            play("x90" * amp(a), qubit_key)
+            play("x90" * amp(a), qubit_key)
+            # play("x90" * amp(a), qubit_key)
+            # play("x90" * amp(a), qubit_key)
+            # Align the two elements to measure after playing the qubit pulse.
             align(qubit_key, res_key)
             # Measure the state of the resonator
+            # The integration weights have changed to maximize the SNR after having calibrated the IQ blobs.
             measure(
                 "readout",
                 res_key,
-                dual_demod.full("opt_cos", "opt_sin", I),
-                dual_demod.full("opt_minus_sin", "opt_cos", Q),
+                dual_demod.full("rotated_cos", "rotated_sin", I),
+                dual_demod.full("rotated_minus_sin", "rotated_cos", Q),
             )
             # Wait for the qubit to decay to the ground state
             wait(thermalization_time, res_key)
-            # Save the 'I_e' & 'Q_e' quadratures to their respective streams
+            # Save the 'I' & 'Q' quadratures to their respective streams
             save(I, I_st)
             save(Q, Q_st)
         # Save the averaging iteration to get the progress bar
@@ -90,22 +80,13 @@ with program() as prog:
 
     with stream_processing():
         # Cast the data into a 1D vector, average the 1D vectors together and store the results on the OPX processor
-        # If log sweep, then the swept values will be slightly different from np.logspace because of integer rounding in QUA.
-        # get_equivalent_log_array() is used to get the exact values used in the QUA program.
-        if np.isclose(np.std(taus[1:] / taus[:-1]), 0, atol=1e-3):
-            taus = get_equivalent_log_array(taus)
-            I_st.buffer(len(taus)).average().save("I")
-            Q_st.buffer(len(taus)).average().save("Q")
-        else:
-            I_st.buffer(len(taus)).average().save("I")
-            Q_st.buffer(len(taus)).average().save("Q")
+        I_st.buffer(len(amplitudes)).average().save("I")
+        Q_st.buffer(len(amplitudes)).average().save("Q")
         n_st.save("iteration")
 
 #####################################
 #  Open Communication with the QOP  #
 #####################################
- 
-from qm import CompilerOptionArguments
 qmm = QuantumMachinesManager(host=qop_ip, cluster_name=cluster)
 
 simulate = False
@@ -113,7 +94,7 @@ if simulate:
     # Simulates the QUA program for the specified duration
     simulation_config = SimulationConfig(duration=2_000)  # In clock cycles = 4ns
     # Simulate blocks python until the simulation is done
-    job = qmm.simulate(config, prog, simulation_config, compiler_options=CompilerOptionArguments(flags=['enable-reset-all-phases-at-program-start']))
+    job = qmm.simulate(config, prog, simulation_config)
     # Get the simulated samples
     samples = job.get_simulated_samples()
     # Plot the simulated samples
@@ -126,7 +107,7 @@ if simulate:
     waveform_report.create_plot(samples, plot=True, save_path=str(Path(__file__).resolve()))
 else:
     # Open the quantum machine
-    qm = qmm.open_qm(config, close_other_machines=True, compiler_options=CompilerOptionArguments(flags=['enable-reset-all-phases-at-program-start']))
+    qm = qmm.open_qm(config, close_other_machines=True)
     # Send the QUA program to the OPX, which compiles and executes it
     job = qm.execute(prog)
     # Get results from QUA program
@@ -142,35 +123,19 @@ else:
         # Progress bar
         progress_counter(iteration, n_avg, start_time=results.get_start_time())
         # Plot results
-        plt.suptitle(f"{qubit_key}, T1 measurement, ({iteration+1}/{n_avg})")
+        plt.suptitle(f"x90 cal {qubit_key}, iteration {iteration+1}/{n_avg}")
         plt.subplot(211)
         plt.cla()
-        plt.plot(4 * taus, I, ".")
+        plt.plot(amplitudes * x90_amp, I, ".")
         plt.ylabel("I quadrature [V]")
         plt.subplot(212)
         plt.cla()
-        plt.plot(4 * taus, Q, ".")
-        plt.xlabel("Qubit decay time [ns]")
+        plt.plot(amplitudes * x90_amp, Q, ".")
+        plt.xlabel("x90 pulse amplitude [a.u.]")
         plt.ylabel("Q quadrature [V]")
         plt.pause(0.1)
         plt.tight_layout()
-
-    # Fit the results to extract the qubit decay time T1
-    try:
-        from qualang_tools.plot.fitting import Fit
-
-        fit = Fit()
-        fig_fit = plt.figure()
-        decay_fit = fit.T1(4 * taus, Q, plot=True)
-        qubit_T1 = np.round(np.abs(decay_fit["T1"][0]) / 4) * 4
-        plt.xlabel("Delay [ns]")
-        plt.ylabel("Q quadrature [V]")
-        print(f"Qubit decay time to update in the config: qubit_T1 = {qubit_T1:.0f} ns")
-        plt.legend((f"Relaxation time T1 = {qubit_T1:.0f} ns",))
-        plt.title(f"{qubit_key}, T1 measurement")
-        save_data_dict.update({"fig_fit": fig_fit})
-    except (Exception,):
-        pass
+    plt.show()
     # Save results
     script_name = Path(__file__).name
     data_handler = DataHandler(root_data_folder=save_dir)
@@ -179,5 +144,5 @@ else:
     save_data_dict.update({"fig_live": fig})
     data_handler.additional_files = {**default_additional_files}
     data_handler.save_data(data=save_data_dict, name="_".join(script_name.split("_")[1:]).split(".")[0])
-    plt.show()
+
     qm.close()

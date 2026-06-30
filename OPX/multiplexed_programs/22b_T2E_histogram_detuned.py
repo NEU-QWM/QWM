@@ -1,0 +1,338 @@
+"""
+        T1 MEASUREMENT
+The sequence consists in putting the qubit in the excited stated by playing the x180 pulse and measuring the resonator
+after a varying time. The qubit T1 is extracted by fitting the exponential decay of the measured quadratures.
+
+Prerequisites:
+    - Having found the resonance frequency of the resonator coupled to the qubit under study (resonator_spectroscopy).
+    - Having calibrated qubit pi pulse (x180) by running qubit, spectroscopy, rabi_chevron, power_rabi and updated the config.
+    - (optional) Having calibrated the readout (readout_frequency, amplitude, duration_optimization IQ_blobs) for better SNR.
+
+Next steps before going to the next node:
+    - Update the qubit T1 (qubit_T1) in the configuration.
+"""
+
+from qm.qua import *
+from qm import QuantumMachinesManager
+from qm import SimulationConfig
+from configuration import *
+from qualang_tools.results import progress_counter, fetching_tool
+from qualang_tools.plot import interrupt_on_close
+from qualang_tools.loops import from_array, get_equivalent_log_array
+import matplotlib.pyplot as plt
+from qualang_tools.results.data_handler import DataHandler
+from macros import single_qubit_parser
+
+from configuration.OPX1000config import *
+
+##################
+#   Parameters   #
+##################
+n_repetitions = 30
+n_avg = 20000  # Number of averaging loops
+qubit_key = "q1"
+required_parameters = ["resonator_key", "readout_len", "qubit_frequency", "qubit_IF", "qubit_relaxation", "x180_amp"]
+res_key, readout_len, qubit_frequency, qubit_IF, qubit_relaxation, x180_amp = single_qubit_parser(multiplexed_parameters.copy(), qubit_key, call_list=required_parameters)
+
+thermalization_time = qubit_relaxation//4 # From ns to clock cycles
+# The wait time sweep (in clock cycles = 4ns) - must be larger than 4 clock cycles
+tau_min = 20 # // 4
+tau_max = 1_000 # // 4
+d_tau = 4 // 4
+# taus = np.arange(tau_min, tau_max + 0.1, d_tau)  # Linear sweep
+taus = np.logspace(np.log10(tau_min), np.log10(tau_max), 200, endpoint=True)  # Log sweep
+taus = np.array(np.unique(taus//4), dtype=int)
+print(taus)
+
+detuning = 10.0 * u.MHz  # in Hz
+
+# Data to save
+save_data_dict = {
+    "qubit": qubit_key,
+    "n_avg": n_avg,
+    "taus": taus,
+    "config": config,
+}
+save_dir = Path(__file__).resolve().parent / "data"
+
+###################
+# The QUA program #
+###################
+with program() as prog:
+    reset_global_phase()
+    n = declare(int)  # QUA variable for the averaging loop
+    tau = declare(int)  # QUA variable for the wait time
+    I = declare(fixed)  # QUA variable for the measured 'I' quadrature
+    Q = declare(fixed)  # QUA variable for the measured 'Q' quadrature
+    I_st = declare_stream()  # Stream for the 'I' quadrature
+    Q_st = declare_stream()  # Stream for the 'Q' quadrature
+    n_st = declare_stream()  # Stream for the averaging iteration 'n'
+
+    update_frequency(qubit_key, qubit_IF + detuning)
+
+    with for_(n, 0, n < n_avg, n + 1):
+        with for_each_(tau, taus):
+            # 1st x90 pulse
+            play("x90", qubit_key)
+            # Wait the varying idle time
+            wait(tau, qubit_key)
+            # Echo pulse
+            play("x180", qubit_key)
+            # Wait the varying idle time
+            wait(tau, qubit_key)
+            # 2nd x90 pulse
+            play("x90", qubit_key)
+            # Align the two elements to measure after playing the qubit pulse.
+            align(qubit_key, res_key)
+            # Measure the state of the resonator
+            measure(
+                "readout",
+                res_key,
+                dual_demod.full("opt_cos", "opt_sin", I),
+                dual_demod.full("opt_minus_sin", "opt_cos", Q),
+            )
+            # Wait for the qubit to decay to the ground state
+            wait(thermalization_time, res_key)
+            # Save the 'I' & 'Q' quadratures to their respective streams
+            save(I, I_st)
+            save(Q, Q_st)
+        # Save the averaging iteration to get the progress bar
+        save(n, n_st)
+
+    with stream_processing():
+        # Cast the data into a 1D vector, average the 1D vectors together and store the results on the OPX processor
+        # If log sweep, then the swept values will be slightly different from np.logspace because of integer rounding in QUA.
+        # get_equivalent_log_array() is used to get the exact values used in the QUA program.
+        if np.isclose(np.std(taus[1:] / taus[:-1]), 0, atol=1e-3):
+            taus = get_equivalent_log_array(taus)
+            I_st.buffer(len(taus)).average().save("I")
+            Q_st.buffer(len(taus)).average().save("Q")
+        else:
+            I_st.buffer(len(taus)).average().save("I")
+            Q_st.buffer(len(taus)).average().save("Q")
+        n_st.save("iteration")
+
+#####################################
+#  Open Communication with the QOP  #
+#####################################
+ 
+from qm import CompilerOptionArguments
+qmm = QuantumMachinesManager(host=qop_ip, cluster_name=cluster)
+
+simulate = False
+if simulate:
+    # Simulates the QUA program for the specified duration
+    simulation_config = SimulationConfig(duration=2_000)  # In clock cycles = 4ns
+    # Simulate blocks python until the simulation is done
+    job = qmm.simulate(config, prog, simulation_config, compiler_options=CompilerOptionArguments(flags=['enable-reset-all-phases-at-program-start']))
+    # Get the simulated samples
+    samples = job.get_simulated_samples()
+    # Plot the simulated samples
+    samples.con1.plot()
+    # Get the waveform report object
+    waveform_report = job.get_simulated_waveform_report()
+    # Cast the waveform report to a python dictionary
+    waveform_dict = waveform_report.to_dict()
+    # Visualize and save the waveform report
+    waveform_report.create_plot(samples, plot=True, save_path=str(Path(__file__).resolve()))
+else:
+    qm = qmm.open_qm(
+        config,
+        close_other_machines=True,
+        compiler_options=CompilerOptionArguments(
+            flags=['enable-reset-all-phases-at-program-start']
+        )
+    )
+
+    from qualang_tools.plot.fitting import Fit
+
+    n_repetitions = 30
+
+    T1_values = []
+    I_all = []
+    Q_all = []
+    fit_results = []
+
+    fit = Fit()
+
+    # -------------------------
+    # SINGLE CONTROL FIGURE
+    # -------------------------
+    fig = plt.figure(figsize=(12, 5))
+    ax_decay = plt.subplot(121)
+    ax_hist = plt.subplot(122)
+
+    # -------------------------
+    # MAIN LOOP CONTROLLED BY FIGURE
+    # -------------------------
+    rep = 0
+
+    while rep < n_repetitions and plt.fignum_exists(fig.number):
+
+        print(f"\n========== T2E run {rep+1}/{n_repetitions} ==========")
+
+        job = qm.execute(prog)
+
+        results = fetching_tool(
+            job,
+            data_list=["I", "Q", "iteration"],
+            mode="live"
+        )
+
+        # -------------------------
+        # WAIT LOOP (QUA RUNNING)
+        # -------------------------
+        while results.is_processing() and plt.fignum_exists(fig.number):
+
+            I, Q, iteration = results.fetch_all()
+
+            I = u.demod2volts(I, readout_len)
+            Q = u.demod2volts(Q, readout_len)
+
+            progress_counter(
+                iteration,
+                n_avg,
+                start_time=results.get_start_time()
+            )
+
+            ax_decay.cla()
+            ax_decay.plot(4 * taus, Q, ".", label="Data")
+            ax_decay.set_xlabel("Delay [ns]")
+            ax_decay.set_ylabel("Q [V]")
+            ax_decay.set_title(f"T_2E run {rep+1}/{n_repetitions}")
+
+            ax_hist.cla()
+
+            if len(T1_values) > 0:
+                ax_hist.hist(T1_values, bins=min(20, len(T1_values)), alpha=0.75, edgecolor='white', linewidth=1)
+                ax_hist.axvline(np.mean(T1_values), color="r", linestyle="--",
+                                label=f"Mean={np.mean(T1_values):.0f}")
+                ax_hist.legend()
+
+            ax_hist.set_xlabel("T2E [ns]")
+            ax_hist.set_ylabel("Counts")
+
+            plt.tight_layout()
+            plt.pause(0.05)
+
+        # -------------------------
+        # STOP CONDITION (GUI CLOSED)
+        # -------------------------
+        if not plt.fignum_exists(fig.number):
+            print("Figure closed → stopping experiment.")
+            job.cancel()
+            break
+
+        # -------------------------
+        # FINAL FETCH
+        # -------------------------
+        I, Q, iteration = results.fetch_all()
+
+        I = u.demod2volts(I, readout_len)
+        Q = u.demod2volts(Q, readout_len)
+
+        I_all.append(I.copy())
+        Q_all.append(Q.copy())
+
+        # -------------------------
+        # FIT
+        # -------------------------
+        try:
+            decay_fit = fit.T1(4 * taus, Q, plot=False)
+
+            T1 = np.round(np.abs(decay_fit["T1"][0]) / 4) * 4
+
+            T1_values.append(T1)
+            fit_results.append({
+                "T1": float(decay_fit["T1"][0]),
+                "amp": float(decay_fit["amp"][0]),
+                "offset": float(decay_fit["final_offset"][0]),
+            })
+
+            print(f"Run {rep+1}: T1 = {T1:.0f} ns")
+
+        except Exception as e:
+            print(f"Fit failed on run {rep+1}: {e}")
+
+        # -------------------------
+        # UPDATE PLOTS
+        # -------------------------
+        ax_decay.cla()
+        ax_decay.plot(4 * taus, Q, ".", label="Data")
+
+        try:
+            A = decay_fit["amp"][0]
+            offset = decay_fit["final_offset"][0]
+            T1_fit = decay_fit["T1"][0]
+
+            fit_curve = offset + A * np.exp(-(4 * taus) / T1_fit)
+            ax_decay.plot(4 * taus, fit_curve, "-r", lw=2,
+                          label=f"T1={T1:.0f} ns")
+        except:
+            pass
+
+        ax_decay.legend()
+
+        ax_hist.cla()
+        ax_hist.hist(T1_values, bins=min(20, len(T1_values)), alpha=0.75, edgecolor='white', linewidth=1)
+
+        if len(T1_values) > 1:
+            ax_hist.axvline(np.mean(T1_values), color="r", linestyle="--",
+                            label=f"Mean={np.mean(T1_values):.0f}")
+            ax_hist.legend()
+
+        plt.tight_layout()
+        plt.pause(0.05)
+
+        rep += 1
+
+    # -------------------------
+    # SAVE (ALWAYS RUNS)
+    # -------------------------
+    try:
+        print("Saving data...")
+
+        script_name = Path(__file__).name
+
+        save_data_dict.update({
+            "I_all": np.array(I_all),
+            "Q_all": np.array(Q_all),
+            "T1_values": np.array(T1_values),
+            "fit_results": fit_results,
+            "live_figure": fig,
+        })
+
+        data_handler = DataHandler(root_data_folder=save_dir)
+        data_handler.additional_files = {**default_additional_files}
+
+        data_handler.save_data(
+            data=save_data_dict,
+            name="_".join(script_name.split("_")[1:]).split(".")[0]
+        )
+
+        print("SAVE SUCCESSFUL")
+
+    except Exception as e:
+        print("SAVE FAILED — dumping raw fallback data")
+
+        fallback_file = save_dir / "T1_backup.npy"
+
+        np.save(
+            fallback_file,
+            {
+                "T1_values": T1_values,
+                "I_all": I_all,
+                "Q_all": Q_all
+            },
+            allow_pickle=True
+        )
+
+        print(f"Backup saved to {fallback_file}")
+        raise e
+
+    try:
+        qm.close()
+    except:
+        pass
+
+    plt.show()
